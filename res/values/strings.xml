@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Contact Leader</string>
+    <string name="ics_service_stopped">Incoming Call Scanner has been stopped</string>
+    <string name="ics_service_started">Incoming Call Scanner started</string>
+    <string name="filtered_contacts">Filtered Contacts</string>
+    <string name="ics_service_running">Is Filtering Service Running?</string>
+</resources>

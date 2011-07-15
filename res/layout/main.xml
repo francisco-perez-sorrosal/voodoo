@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/textView2" android:text="@string/ics_service_running"></TextView>
+    <ToggleButton android:text="ToggleButton" android:layout_height="wrap_content" android:id="@+id/startStopTB" android:layout_width="match_parent"></ToggleButton>
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="match_parent" android:text="@string/filtered_contacts" android:layout_height="wrap_content" android:id="@+id/textView1" ></TextView>
+    <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/filteredContactsLV"></ListView>
+</LinearLayout>
