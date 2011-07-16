@@ -128,6 +128,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Toast.makeText(this, "IncomingCallScanner not bound. Connect first!", Toast.LENGTH_SHORT).show();
 			}
 			break;
+		case R.id.logs:
+			// TODO: Fill with the Intent to start log activity
+			break;
 		}
 		return true;
 	}
