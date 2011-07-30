@@ -10,17 +10,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.acl.root.utils.InstrumentedConcurrentMap;
-import org.acl.root.R;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
@@ -55,6 +56,7 @@ public class IncomingCallScanner extends Service {
 	
     private TelephonyManager tm;
     private com.android.internal.telephony.ITelephony telephonyService;
+
    
 	private ConcurrentMap<String, String> blackList = new InstrumentedConcurrentMap<String, String>(new ConcurrentHashMap<String, String>());
 	
@@ -92,11 +94,17 @@ public class IncomingCallScanner extends Service {
 	          if(blackList.containsKey(plainPhoneNumber)) {
 	        	  	if(telephonyService != null) {
 	        	  		try {
+	        	  		
 	        	  				String name = blackList.get(plainPhoneNumber);
 	        	  				CharSequence text = "Fucking " + name + "\nEnding call";
 	        	  				showToastWithImage(text, R.drawable.app_icon);
 							telephonyService.silenceRinger();
-							telephonyService.endCall();
+							boolean result =telephonyService.endCall();
+							if(!result){
+								
+								Log.i(TAG, "Telephony Service is bad and does not finish the call");
+							}
+							saveLogToFile((new Date()).toGMTString() + " " + name + " " +plainPhoneNumber+"\n");
 					} catch (RemoteException e) {
 				        Log.i(TAG, "Can't access Telephony Service");
 						e.printStackTrace();
@@ -134,7 +142,7 @@ public class IncomingCallScanner extends Service {
 				e.printStackTrace();
 			}
 			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-
+			
 			serviceRunning = true;			
 			Log.d(TAG, "Created");
 		}
@@ -156,9 +164,8 @@ public class IncomingCallScanner extends Service {
 	        saveMapToFile();
 	        blackList.clear();
 	        // Stop filtering calls, otherwise they'll continue to be filtered
-			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE); 
+			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE); 		
 	        tm = null;
-			cancelNotification(SVC_STARTED_NOTIFICATION);
 	        serviceRunning = false;
 	        Log.d(TAG, "Stopped");
 	        // Tell the user we stopped.
@@ -239,7 +246,7 @@ public class IncomingCallScanner extends Service {
     				String data = entry.getKey() + "-" + entry.getValue() + "\n";
     		        Log.d(TAG, "Writting " + data);
     			    buffwriter.write(data);
-    		        outputwriter.write(data);
+    		      
     			}
     			buffwriter.close();
     			outputwriter.close();
@@ -301,4 +308,29 @@ public class IncomingCallScanner extends Service {
 		toast.setView(layout);
 		toast.show();
 	}
+	
+	private void saveLogToFile(String data){
+    	
+  		try {
+  			FileOutputStream fos = openFileOutput(ShowLogActivity.LOGFILE,Context.MODE_PRIVATE|Context.MODE_APPEND);
+  			
+  			OutputStreamWriter outputwriter = new OutputStreamWriter(fos);
+  			BufferedWriter buffwriter = new BufferedWriter(outputwriter);			
+  		    buffwriter.append(data);	
+  	    	buffwriter.close();
+  			outputwriter.close();
+
+  			fos.close();
+			
+		
+		} catch (FileNotFoundException e) {
+			Toast.makeText(this, "FileNotFoundException" + e.toString(), Toast.LENGTH_SHORT).show();
+		} catch (IOException e) {
+			Toast.makeText(this, "IOException" + e.toString(), Toast.LENGTH_SHORT).show();
+		}
+
+  }
+
+
 }
+

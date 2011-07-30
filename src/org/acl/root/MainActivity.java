@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.contacts:
+		case R.id.contacts:			
 			if(incomingCallScannerIsBound) {
 				Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
 				startActivityForResult(intentContact, PICK_CONTACT);
@@ -130,11 +130,17 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			break;
 		case R.id.logs:
 			// TODO: Fill with the Intent to start log activity
+			
+			Intent intenShowLog1 = new Intent(this ,ShowLogActivity.class);
+			startActivityForResult(intenShowLog1,1111);
 			break;
 		}
 		return true;
 	}
 
+	  
+	
+	
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == PICK_CONTACT) {
 			if(intent != null) { // This is required because the user cannot select any contact

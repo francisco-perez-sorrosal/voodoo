@@ -5,4 +5,7 @@
     <string name="ics_service_started">Incoming Call Scanner started</string>
     <string name="filtered_contacts">Filtered Contacts</string>
     <string name="ics_service_running">Is Filtering Service Running?</string>
+    <string name="app_name2">Show Log</string>
+    <string name="clear_log">Clear Log</string>
+    <string name="log_label">Log</string>
 </resources>
