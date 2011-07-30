@@ -1,11 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:background="@color/background"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/textView2" android:text="@string/ics_service_running"></TextView>
-    <ToggleButton android:text="ToggleButton" android:layout_height="wrap_content" android:id="@+id/startStopTB" android:layout_width="match_parent"></ToggleButton>
-    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="match_parent" android:text="@string/filtered_contacts" android:layout_height="wrap_content" android:id="@+id/textView1" ></TextView>
-    <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/filteredContactsLV"></ListView>
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/textView2" android:text="@string/ics_service_running" android:textStyle="bold" android:layout_gravity="center" android:layout_width="wrap_content"></TextView>
+    <ToggleButton android:text="ToggleButton" android:layout_height="wrap_content" android:id="@+id/startStopTB" android:layout_width="match_parent" android:textOn="@string/started" android:textOff="@string/stopped"></ToggleButton>
+    <TableLayout android:id="@+id/tableLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
+        <View android:layout_marginBottom="5dip" android:layout_marginTop="5dip" android:background="#DDFFDD" android:layout_height="2px"></View>
+        <TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <LinearLayout android:baselineAligned="false" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout1">
+                <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:layout_height="wrap_content" android:text="@string/email_enabled" android:layout_weight="1" android:id="@+id/textView4" android:textStyle="italic"></TextView>
+                <ToggleButton android:layout_width="wrap_content" android:id="@+id/toggleButton1" android:text="ToggleButton" android:layout_height="wrap_content" android:layout_weight="1"></ToggleButton>
+                <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:layout_height="wrap_content" android:text="@string/twitter_enabled" android:layout_weight="1" android:id="@+id/textView3" android:textStyle="italic"></TextView>
+                <ToggleButton android:layout_width="wrap_content" android:id="@+id/twitterTB" android:text="ToggleButton" android:layout_height="wrap_content" android:layout_weight="1"></ToggleButton>
+            </LinearLayout>
+        </TableRow>
+        <View android:layout_marginBottom="5dip" android:layout_marginTop="5dip" android:background="#DDFFDD" android:layout_height="2px"></View>
+        <TableRow android:id="@+id/tableRow2" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <LinearLayout android:layout_height="match_parent" android:layout_width="wrap_content" android:orientation="vertical" android:id="@+id/linearLayout2">
+                <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/filtered_contacts" android:id="@+id/textView1" android:textStyle="bold|italic"></TextView>
+                <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/filteredContactsLV"></ListView>
+            </LinearLayout>
+        </TableRow>
+        <TableRow android:id="@+id/tableRow3" android:layout_width="wrap_content" android:layout_height="wrap_content"></TableRow>
+        <TableRow android:id="@+id/tableRow4" android:layout_width="wrap_content" android:layout_height="wrap_content"></TableRow>
+    </TableLayout>
 </LinearLayout>

@@ -1,5 +1,12 @@
 package org.acl.root;
 
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -7,7 +14,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
@@ -35,9 +45,13 @@ import android.widget.ToggleButton;
 public class MainActivity extends Activity implements OnClickListener, OnItemClickListener {
 
 	private static final String TAG = "MainActivity";
+	
 	private static final int PICK_CONTACT = 0;
+	private static final int GET_TWITTER_CONSUMER_DATA = 1;
+	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
+	private ToggleButton twitterTB;
 	private ListView filteredContactsLV;
 	private ArrayAdapter<CharSequence> filteredContactsAdapter;
 
@@ -56,6 +70,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 				incomingCallScannerIsBound = true;
+				if(incomingCallScanner.isTwitterEnabled())
+					twitterTB.setChecked(true);
 			} else {
 				Log.d(TAG, "onServiceConnected: IncomingCallScanner is null");
 			}
@@ -73,17 +89,30 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
 
+		setContentView(R.layout.main);
+		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
+
+		twitterTB = (ToggleButton) findViewById(R.id.twitterTB);
+		twitterTB.setOnClickListener(this);
 
 		filteredContactsLV = (ListView) findViewById(R.id.filteredContactsLV);
 		filteredContactsLV.setOnItemClickListener(this);
 
 		bindService(new Intent(this, 
 				IncomingCallScanner.class), mConnection, Context.BIND_NOT_FOREGROUND);
-
+		
+		twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
+		
+//		twitterPreferences.edit()
+//	    .putString(TWITTER_OAUTH_CONSUMER_KEY, "")
+//	    .putString(TWITTER_OAUTH_CONSUMER_SECRET, "")
+//	    .putString(TWITTER_OAUTH_ACCESS_TOKEN, "")
+//	    .putString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "")
+//	    .commit();
+		
 		Log.d(TAG, "onCreate");
 	}
 
@@ -91,6 +120,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	protected void onDestroy() {
 		super.onDestroy();
 		if(incomingCallScannerIsBound) { 
+			// Do not call clearTwitterConnection() on destroying this activity
+			// cause if twitter is enabled messages must be sent!!!
+			// Clean incoming call scanner service connection
 			unbindService(mConnection);
 			incomingCallScannerIsBound = false;
 		}
@@ -128,6 +160,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Toast.makeText(this, "IncomingCallScanner not bound. Connect first!", Toast.LENGTH_SHORT).show();
 			}
 			break;
+		case R.id.twitter:
+			launchTwitterOAuthActivity();
+			break;
 		case R.id.logs:
 			// TODO: Fill with the Intent to start log activity
 			break;
@@ -136,7 +171,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		if (requestCode == PICK_CONTACT) {
+		switch(requestCode) {
+		case PICK_CONTACT:
 			if(intent != null) { // This is required because the user cannot select any contact
 				Contact  contact = getContactInfo(intent);
 				// Your class variables now have the data, so do something with it
@@ -147,14 +183,44 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					filteredContactsAdapter.add(name + " (" + phoneNumber + ")");
 					filteredContactsAdapter.notifyDataSetChanged();
 					filteredContactsLV.refreshDrawableState();
-					Toast.makeText(this, name + " is filtered", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, name + " has been filtered", Toast.LENGTH_SHORT).show();
 				} else {
 					Toast.makeText(this, "Some data (Name or Phone Numer) is missing", Toast.LENGTH_SHORT).show();
 				}
 			} else {
 				Toast.makeText(this, "No contact was selected", Toast.LENGTH_SHORT).show();
 			}
+			break;
+		case GET_TWITTER_CONSUMER_DATA:
+			if (resultCode == Activity.RESULT_OK) {
+				twitterOAuthConsumerData = new OAuthAccessToken(
+						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_KEY),
+						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_SECRET));
+				prepareTwitterConnection();
+			}
+			break;
+		case GET_TWITTER_ACCESS_TOKEN:
+			if (resultCode == Activity.RESULT_OK) {
+				
+			    String oauthVerifier = (String) intent.getExtras().get("oauth_verifier");
+			 
+			    try {
+			        // Pair up our request with the response
+			    		AccessToken receivedTwitterOAuthAccessToken = 
+			    				twitter.getOAuthAccessToken(twitterOAuthRequestToken, oauthVerifier);
+			    		// Here we can safely save Access Token and inform the user
+			        saveTwitterOAuthAccessTokenInAppPreferences(receivedTwitterOAuthAccessToken);
+					Toast.makeText(this, "Now you can connect to Twitter", Toast.LENGTH_SHORT).show();
+			    } catch (TwitterException e) {
+					Toast.makeText(this, "Error getting the Twitter Access Token", Toast.LENGTH_SHORT).show();
+			    }
+			    
+			} else {
+				Toast.makeText(this, "Twitter Authorization Failed", Toast.LENGTH_SHORT).show();
+			}
+			break;
 		}
+		
 	}
 
 	@Override
@@ -170,12 +236,65 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onClick: service started");
 			} else {
 				Log.d(TAG, "onClick: stopping service");
+				clearTwitterConnection();
 				stopService(new Intent(this, IncomingCallScanner.class));
 				filteredContactsAdapter.clear();
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 				Log.d(TAG, "onClick: service stopped");
 			}
+			break;
+		case R.id.twitterTB:
+			if(twitterTB.isChecked()) {
+				if(incomingCallScannerIsBound) {
+					
+					if(!isNetworkAvailable()) {
+						Toast.makeText(this, "Network connection not available", Toast.LENGTH_SHORT).show();
+						clearTwitterConnection();
+						return;
+					}
+					
+					twitterOAuthConsumerData = loadTwitterOAuthConsumerDataFromAppPreferences();
+					twitterOAuthAccessToken = loadTwitterOAuthAccessTokenFromAppPreferences();
+					
+					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
+							&& isTwitterOAuthAccessTokenValid(twitterOAuthAccessToken)) {
+						
+						// Both values were stored properly, so get Twitter connection
+						AccessToken realTwitterOAuthAccessToken = 
+								new AccessToken(twitterOAuthAccessToken.getToken(), twitterOAuthAccessToken.getTokenSecret());						
+						Twitter twitterConnection = getTwitterConnection(twitterOAuthConsumerData, realTwitterOAuthAccessToken);
+						incomingCallScanner.setTwitterConnection(twitterConnection);
+						
+					} else {
+						
+						prepareTwitterConnection();
+						
+					}
+				} else {
+					twitterTB.setChecked(false);
+				}
+			} else {
+				clearTwitterConnection();
+			}
+			break;
+		}
+	}
+
+	// Get the required elements to get a Twitter connection
+	private void prepareTwitterConnection() {
+		try {
+			// Step 1: Get the request token. If the consumer data is wrong a an exception will be thrown
+			twitterOAuthRequestToken = getTwitterOAuthRequestToken();
+			// Step 2: Here we can safely save Consumer Data
+			saveTwitterOAuthConsumerDataInAppPreferences(twitterOAuthConsumerData);
+			// Step 3: Use request token to get access token by means of an intermediate activity
+			Toast.makeText(this, "Please, put your Twitter user and password", Toast.LENGTH_SHORT).show();
+			launchTwitterWebviewActivity(twitterOAuthRequestToken);
+		} catch (TwitterException e) {
+			Toast.makeText(this, "Please, set properly your Twitter Consumer Key and Secret on the Main Menu", Toast.LENGTH_SHORT).show();
+		} finally {
+			twitterTB.setChecked(false);
 		}
 	}
 
@@ -263,34 +382,133 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		return contact;
 	}
 	
-	////////////// OLD CODE TO SEND INTENT IN ORDER TO ADD A NEW CONTACT
-	//	Intent newContact = new Intent();
-	//	newContact.setAction("RECEIVE_NEW_CONTACT");
-	//	newContact.putExtra("Contact", contact);
-	//	getBaseContext().sendBroadcast(newContact);
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null;
+	}
+	
+	// ------------------------- Twitter Related Stuff ------------------------
+	
+	protected static final String TWITTER_PREFS = "twitter_preferences";
+	
+	protected static final String TWITTER_OAUTH_CONSUMER_KEY = "twitter_oauth_consumer_key";
+	protected static final String TWITTER_OAUTH_CONSUMER_SECRET = "twitter_oauth_consumer_secret";
+	
+	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
+	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
+	
+	private  SharedPreferences twitterPreferences;
+	
+	private Twitter twitter;
+	private RequestToken twitterOAuthRequestToken;
+	private OAuthAccessToken twitterOAuthConsumerData;
+	private OAuthAccessToken twitterOAuthAccessToken;
+	
+	private RequestToken getTwitterOAuthRequestToken() throws TwitterException {
+		
+		twitter = new TwitterFactory().getInstance();
+		Log.d(TAG, "Token " + twitterOAuthConsumerData.getToken() + " Token Secret " + twitterOAuthConsumerData.getTokenSecret());
+		twitter.setOAuthConsumer(twitterOAuthConsumerData.getToken(), twitterOAuthConsumerData.getTokenSecret()); 
+		
+		String callbackURL = getResources().getString(R.string.twitter_callback); 
+		// This can throw TwitterException if the oauthConsumerData is not correct
+        return twitter.getOAuthRequestToken(callbackURL);
+	}
+	
+	private Twitter getTwitterConnection(OAuthAccessToken oauthConsumerData, AccessToken twitterAccessToken) {
+		
+		Configuration conf = new ConfigurationBuilder()
+	    .setOAuthConsumerKey(oauthConsumerData.getToken())
+	    .setOAuthConsumerSecret(oauthConsumerData.getTokenSecret())
+	    .setOAuthAccessToken(twitterAccessToken.getToken())
+	    .setOAuthAccessTokenSecret(twitterAccessToken.getTokenSecret())
+	    .build();
+	 
+		return new TwitterFactory(conf).getInstance();
+	}
+	
+	private void clearTwitterConnection() {
+			if(incomingCallScannerIsBound) {
+				incomingCallScanner.discardTwitterConnection();
+			}
+			twitterOAuthConsumerData = null;
+			twitterOAuthRequestToken = null;
+			twitterOAuthAccessToken =  null;
+			twitter = null;
+			twitterTB.setChecked(false);
+	}
+	
+	private boolean isTwitterOAuthConsumerDataValid(OAuthAccessToken oauthConsumerData) {
+		return (!oauthConsumerData.getToken().equals("") && !oauthConsumerData.getTokenSecret().equals(""));
+	}
+	
+	private boolean isTwitterOAuthAccessTokenValid(OAuthAccessToken oauthAccessToken) {
+		return (!oauthAccessToken.getToken().equals("") && !oauthAccessToken.getTokenSecret().equals(""));
+	}
+	
+	private OAuthAccessToken loadTwitterOAuthConsumerDataFromAppPreferences() {
+		Log.d(TAG, "onClick: inTwitterOACD");
+		return new OAuthAccessToken(
+				twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_KEY, "")
+				,twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_SECRET, ""));
+	}
 
-	// This part goes on the receiver
+	private OAuthAccessToken loadTwitterOAuthAccessTokenFromAppPreferences() {
+		Log.d(TAG, "onClick: inTwitterAT");
+		return new OAuthAccessToken(
+				twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" )
+				,twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ));
+	}
 
-	// IntentFilter intentFilter;
-	//	
-	//	intentFilter = new IntentFilter();
-	//	intentFilter.addAction("RECEIVE_NEW_CONTACT");
-	//	
-	//	intentReceiver = new BroadcastReceiver() {
-	//			@Override
-	//			public void onReceive(Context context, Intent intent) {
-	//				Log.d(TAG, "onReceive in Service");
-	//				if(intent.getAction().equals("RECEIVE_NEW_CONTACT")) {
-	//					Contact contact = (Contact) intent.getExtras().get("Contact");
-	//					String name = contact.getName();
-	//					String phone = contact.getPhoneNumbers().get(0);
-	//					blackList.putIfAbsent(phone, name);
-	//			        Log.d(TAG, name + " " + phone + " added");
-	//				}
-	//			}
-	//		};
-	//
-	// registerReceiver(intentReceiver, intentFilter);
-	// 	        unregisterReceiver(intentReceiver);
+	private void saveTwitterOAuthConsumerDataInAppPreferences(OAuthAccessToken consumerData) {
+		twitterPreferences.edit()
+		    .putString(TWITTER_OAUTH_CONSUMER_KEY, consumerData.getToken())
+		    .putString(TWITTER_OAUTH_CONSUMER_SECRET, consumerData.getTokenSecret())
+		    .commit();
+		Toast.makeText(this, "Twitter OAuth Consumer Data saved in Preferences", Toast.LENGTH_SHORT).show();
+	}
 
+	private void saveTwitterOAuthAccessTokenInAppPreferences(AccessToken accessToken) {
+		twitterPreferences.edit()
+		    .putString(TWITTER_OAUTH_ACCESS_TOKEN, accessToken.getToken())
+		    .putString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, accessToken.getTokenSecret())
+		    .commit();
+		Toast.makeText(this, "Twitter OAuth Access Token saved in Preferences", Toast.LENGTH_SHORT).show();
+	}
+	
+	private  void launchTwitterOAuthActivity() {
+		Intent i = new Intent(this, TwitterOAuthConsumerDataActivity.class);
+		startActivityForResult(i, GET_TWITTER_CONSUMER_DATA);
+	}
+	
+	private  void launchTwitterWebviewActivity(RequestToken twitterOAuthRequestToken) {
+		Intent i = new Intent(this, TwitterWebviewActivity.class);
+		i.putExtra("URL", twitterOAuthRequestToken.getAuthenticationURL());
+		startActivityForResult(i, GET_TWITTER_ACCESS_TOKEN);
+	}
+
+	// ----------------------- To Store Twitter Tokens ------------------------
+	
+	private class OAuthAccessToken {
+		
+		private String token;
+		private String tokenSecret;
+		
+		public OAuthAccessToken(String token, String tokenSecret) {
+			super();
+			this.token = token;
+			this.tokenSecret = tokenSecret;
+		}
+		
+		public String getToken() {
+			return token;
+		}
+		
+		public String getTokenSecret() {
+			return tokenSecret;
+		}
+	}
+	
 }
