@@ -119,13 +119,11 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		if(incomingCallScannerIsBound) { 
-			// Do not call clearTwitterConnection() on destroying this activity
-			// cause if twitter is enabled messages must be sent!!!
-			// Clean incoming call scanner service connection
-			unbindService(mConnection);
-			incomingCallScannerIsBound = false;
-		}
+		// Do not call clearTwitterConnection() on destroying this activity
+		// cause if twitter is enabled messages must be sent!!!
+		// Clean incoming call scanner service connection
+		unbindService(mConnection);
+		incomingCallScannerIsBound = false;
 		Log.d(TAG, "onDestroy");
 	}
 
@@ -152,7 +150,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.contacts:
+		case R.id.contacts:			
 			if(incomingCallScannerIsBound) {
 				Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
 				startActivityForResult(intentContact, PICK_CONTACT);
@@ -164,12 +162,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			launchTwitterOAuthActivity();
 			break;
 		case R.id.logs:
-			// TODO: Fill with the Intent to start log activity
+			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
+			startActivity(showLogIntent);
 			break;
 		}
 		return true;
 	}
-
+	
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		switch(requestCode) {
 		case PICK_CONTACT:

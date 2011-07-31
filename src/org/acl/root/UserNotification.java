@@ -56,4 +56,9 @@ public class UserNotification {
 		mNotificationManager.notify(SVC_STARTED_NOTIFICATION, notification);
 	}
 
+	public static void cancelNotification(Context context, int notification) {
+		NotificationManager mNotificationManager = 
+				(NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(notification);
+	}
 }

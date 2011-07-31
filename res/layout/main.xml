@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/textView2" android:text="@string/ics_service_running" android:textStyle="bold" android:layout_gravity="center" android:layout_width="wrap_content"></TextView>
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/textView2" android:textStyle="bold" android:layout_gravity="center" android:layout_width="wrap_content" android:text="@string/ics_service_enabled"></TextView>
     <ToggleButton android:text="ToggleButton" android:layout_height="wrap_content" android:id="@+id/startStopTB" android:layout_width="match_parent" android:textOn="@string/started" android:textOff="@string/stopped"></ToggleButton>
     <TableLayout android:id="@+id/tableLayout1" android:layout_height="wrap_content" android:layout_width="match_parent">
         <View android:layout_marginBottom="5dip" android:layout_marginTop="5dip" android:background="#DDFFDD" android:layout_height="2px"></View>

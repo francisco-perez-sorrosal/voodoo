@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Contact Leader</string>
-    <string name="ics_service_stopped">Incoming Call Scanner has been stopped</string>
-    <string name="ics_service_started">Incoming Call Scanner started</string>
-    <string name="filtered_contacts">Filtered Contacts</string>
-    <string name="ics_service_running">Start/Stop Filtering Service</string>
+    <string name="app_name">Contact Blacklist</string>
+    
+    <!-- Filtering service related strings -->
+    <string name="ics_service_enabled">Start/Stop Filtering Service</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
+    <string name="ics_service_started">Incoming Call Scanner started</string>    
+    <string name="ics_service_stopped">Incoming Call Scanner has been stopped</string>
+    <string name="filtered_contacts">Filtered Contacts</string>
 
     <!-- Email related strings -->    
     <string name="email_enabled">E-mail caller?</string>
@@ -18,7 +20,12 @@
     <string name="twitter_wrong_consumer_data">You must enter your Key and Secret from Twitter</string>
     <string name="twitter_webview_name">Twitter credentials</string>
     <string name="tweet_not_sent">Your Tweet could not be sent :-(</string>
-    <string name="javi_twitter_message">OH NOOOOO!!! Fucking Javi is back again... (Sent automatically from Fucking Javi app in my Android phone)</string>
+    <string name="javi_twitter_message">OH NOOOOO!!! Fucking Javi is back again... (Sent automatically from Contact Blacklist app in my Android phone)</string>
     <string name="twitter_message_1">Call from </string>
     <string name="twitter_message_2"> received. Call ended.</string>
+
+	<!-- Call log related strings -->
+	<string name="call_log">Call Log</string>
+    <string name="log_label">Received Calls</string>
+    <string name="clear_log">Clear Log</string>
 </resources>

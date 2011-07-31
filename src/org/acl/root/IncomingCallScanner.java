@@ -19,7 +19,6 @@ import org.acl.root.utils.InstrumentedConcurrentMap;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -103,6 +102,8 @@ public class IncomingCallScanner extends Service {
 							+ getResources().getString(R.string.twitter_message_1)
 							+ " " + name + " " 
 							+  getResources().getString(R.string.twitter_message_2);
+					// Log actions
+					saveLogToFile((new Date()).toGMTString() + " " + name + " " + plainPhoneNumber+"\n");
 					// Twitter actions
 					if(isTwitterEnabled()) {
 						try {
@@ -174,7 +175,7 @@ public class IncomingCallScanner extends Service {
 			// Stop filtering calls, otherwise they'll continue to be filtered
 			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE); 
 			tm = null;
-			cancelNotification(UserNotification.SVC_STARTED_NOTIFICATION);
+			UserNotification.cancelNotification(getApplicationContext(), UserNotification.SVC_STARTED_NOTIFICATION);
 			serviceRunning = false;
 			Log.d(TAG, "Stopped");
 			// Tell the user we stopped.
@@ -269,38 +270,72 @@ public class IncomingCallScanner extends Service {
 		}
 	}
 
-	private void saveMapToFile(){
+	private void saveMapToFile() {
+		FileOutputStream fos = null;
+		OutputStreamWriter outputwriter = null;
+		BufferedWriter buffwriter = null;
 
 		try {
-			FileOutputStream fos = openFileOutput(FILE, Context.MODE_PRIVATE);
+			fos = openFileOutput(FILE, Context.MODE_PRIVATE);
 
-			OutputStreamWriter outputwriter = new OutputStreamWriter(fos);
-			BufferedWriter buffwriter = new BufferedWriter(outputwriter);
+			outputwriter = new OutputStreamWriter(fos);
+			buffwriter = new BufferedWriter(outputwriter);
 
 			for (Map.Entry<String, String> entry : blackList.entrySet()) {
 				String data = entry.getKey() + "-" + entry.getValue() + "\n";
 				Log.d(TAG, "Writting " + data);
 				buffwriter.write(data);
-				outputwriter.write(data);
 			}
-			buffwriter.close();
-			outputwriter.close();
-
-			fos.close();
-
 			Toast.makeText(this, "Black List Saved", Toast.LENGTH_SHORT).show();
 		} catch (FileNotFoundException e) {
-			Toast.makeText(this, "FileNotFoundException" + e.toString(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "FileNotFoundException" + e.toString(),
+					Toast.LENGTH_SHORT).show();
 		} catch (IOException e) {
-			Toast.makeText(this, "IOException" + e.toString(), Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "IOException" + e.toString(),
+					Toast.LENGTH_SHORT).show();
+		} finally {
+			try {
+				if (buffwriter != null) buffwriter.close();
+				if (outputwriter != null) outputwriter.close();
+				if (fos != null) fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
 
-	private void cancelNotification(int notification) {
-		NotificationManager mNotificationManager = 
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(notification);
+	private void saveLogToFile(String data) {
+		FileOutputStream fos = null;
+		OutputStreamWriter outputwriter = null;
+		BufferedWriter buffwriter = null;
+
+		try {
+			fos = openFileOutput(ShowLogActivity.LOGFILE, 
+					Context.MODE_PRIVATE | Context.MODE_APPEND);
+
+			outputwriter = new OutputStreamWriter(fos);
+			buffwriter = new BufferedWriter(outputwriter);
+
+			buffwriter.append(data);
+			Toast.makeText(this, "Call saved in log", Toast.LENGTH_SHORT)
+					.show();
+		} catch (FileNotFoundException e) {
+			Toast.makeText(this, "FileNotFoundException" + e.toString(),
+					Toast.LENGTH_SHORT).show();
+		} catch (IOException e) {
+			Toast.makeText(this, "IOException" + e.toString(),
+					Toast.LENGTH_SHORT).show();
+		} finally {
+			try {
+				if (buffwriter != null) buffwriter.close();
+				if (outputwriter != null) outputwriter.close();
+				if (fos != null) fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-	
+
 }
+
