@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,7 +105,8 @@ public class IncomingCallScanner extends Service {
 								
 								Log.i(TAG, "Telephony Service is bad and does not finish the call");
 							}
-							saveLogToFile((new Date()).toGMTString() + " " + name + " " +plainPhoneNumber+"\n");
+							Calendar calendar = Calendar.getInstance();
+							saveLogToFile(calendar.getTime().toString() + " " + name + " " +plainPhoneNumber+"\n");
 					} catch (RemoteException e) {
 				        Log.i(TAG, "Can't access Telephony Service");
 						e.printStackTrace();
