@@ -24,54 +24,58 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_log);
 
-		LoadScreen();
+		loadScreen();
 		btnBack = (Button) findViewById(R.id.btnBack);
 		btnBack.setOnClickListener(this);
 	}
 
-	private void LoadScreen() {
+	private void loadScreen() {
 
+		FileInputStream fis = null;
+		InputStreamReader inputreader = null;
+		BufferedReader buffreader = null;
+				
 		LinearLayout callList = (LinearLayout) findViewById(R.id.showLogLayout);
-		TextView texto;
+		TextView text;
 
 		try {
-			FileInputStream fis = openFileInput(LOGFILE);
+			fis = openFileInput(LOGFILE);
 
-			InputStreamReader inputreader = new InputStreamReader(fis);
-			BufferedReader buffreader = new BufferedReader(inputreader);
+			inputreader = new InputStreamReader(fis);
+			buffreader = new BufferedReader(inputreader);
 
 			String line;
-			int count = 1;
 			// read every line of the file into the line-variable, on line at
 			// the time
 			while ((line = buffreader.readLine()) != null) {
 
-				texto = new TextView(this);
-				texto.setLayoutParams(new LayoutParams(
+				text = new TextView(this);
+				text.setLayoutParams(new LayoutParams(
 						LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-				texto.setClickable(false);
-				// texto.setOnClickListener(this);
-				texto.setId(count);
-				texto.setText(line);
-				callList.addView(texto);
-				count++;
+				text.setClickable(false);
+				text.setText(line);
+				callList.addView(text);
 			}
-			buffreader.close();
-			inputreader.close();
-			fis.close();
-
 		} catch (FileNotFoundException e) {
 			Toast.makeText(this, "File Still not created", Toast.LENGTH_SHORT)
 					.show();
 		} catch (IOException e) {
 			Toast.makeText(this, "Exception" + e.toString(), Toast.LENGTH_SHORT)
 					.show();
+		} finally {
+			try {
+				if (buffreader != null) buffreader.close();
+				if (inputreader != null) inputreader.close();
+				if (fis != null) fis.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
 
 	@Override
-	public void onClick(View arg0) {
+	public void onClick(View view) {
 
 		boolean result = deleteFile(LOGFILE);
 
