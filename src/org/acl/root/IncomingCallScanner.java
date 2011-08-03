@@ -104,7 +104,7 @@ public class IncomingCallScanner extends Service {
 							+ " " 
 							+ getResources().getString(R.string.twitter_message_1)
 							+ " " + name + " " 
-							+  getResources().getString(R.string.twitter_message_2);
+							+  getResources().getString(R.string.twitter_message_2));
 					// Log actions					
 					saveLogToFile(calendar.getTime().toString() + " " + name + " " + plainPhoneNumber+"\n");
 					// Twitter actions

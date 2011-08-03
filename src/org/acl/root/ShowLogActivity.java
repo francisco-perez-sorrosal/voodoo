@@ -43,7 +43,7 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 
 			inputreader = new InputStreamReader(fis);
 			buffreader = new BufferedReader(inputreader);
-
+	        boolean existMissingCalls=false;
 			String line;
 			// read every line of the file into the line-variable, on line at
 			// the time
@@ -55,9 +55,14 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 				text.setClickable(false);
 				text.setText(line);
 				callList.addView(text);
+				existMissingCalls=true;
+			}
+			if(!existMissingCalls){
+				Toast.makeText(this, "Received Calls is empty", Toast.LENGTH_SHORT)
+				.show();
 			}
 		} catch (FileNotFoundException e) {
-			Toast.makeText(this, "File Still not created", Toast.LENGTH_SHORT)
+			Toast.makeText(this, "Received Calls is empty", Toast.LENGTH_SHORT)
 					.show();
 		} catch (IOException e) {
 			Toast.makeText(this, "Exception" + e.toString(), Toast.LENGTH_SHORT)
