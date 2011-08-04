@@ -11,7 +11,6 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -21,17 +20,15 @@ import org.acl.root.utils.InstrumentedConcurrentMap;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.RemoteException;
-import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.android.internal.telephony.ITelephony;
 
 /**
  * This is the service responsible of capturing incoming calls and 
@@ -47,9 +44,6 @@ public class IncomingCallScanner extends Service {
 	private static final String FILE = "blacklist.txt";
 
 	private static final String JAVI_PHONE = "630445705";
-
-	private TelephonyManager tm;
-	private com.android.internal.telephony.ITelephony telephonyService;
 
 	private ConcurrentMap<String, String> blackList = new InstrumentedConcurrentMap<String, String>(new ConcurrentHashMap<String, String>());
 
@@ -75,66 +69,70 @@ public class IncomingCallScanner extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return mBinder;
-	}	
-
-	private PhoneStateListener phoneStateListener = new PhoneStateListener() {
+	}
+	
+	private BroadcastReceiver phoneStateReceiver = new BroadcastReceiver() {
 		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction().equals("android.intent.action.PHONE_STATE")) {
+				String state = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+				Log.d(TAG, "Call State=" + state);
 
-		public void onCallStateChanged(int state, String incomingNumber) {
-			super.onCallStateChanged(state, incomingNumber);
-
-			switch (state){
-			case TelephonyManager.CALL_STATE_RINGING:
-				Log.d(TAG, "ringing " + incomingNumber);
-				String plainPhoneNumber = incomingNumber.replaceAll("[\\s\\-()]", "");
-				if(blackList.containsKey(plainPhoneNumber)) {
-					// Telephony actions
-					try {
-						telephonyService.silenceRinger();
-						telephonyService.endCall();
-					} catch (RemoteException e) {
-						Log.e(TAG, "Can't access Telephony Service");
-						e.printStackTrace();
-					}
-					Calendar calendar = Calendar.getInstance();
-					// Get relevant call info
-					String name = blackList.get(plainPhoneNumber);
-					CharSequence text = 
-							(calendar.getTime().toString() // To avoid tweet discard 
-							+ " " 
-							+ getResources().getString(R.string.twitter_message_1)
-							+ " " + name + " " 
-							+  getResources().getString(R.string.twitter_message_2));
-					// Log actions					
-					saveLogToFile(calendar.getTime().toString() + " " + name + " " + plainPhoneNumber+"\n");
-					// Twitter actions
-					if(isTwitterEnabled()) {
-						try {
-							Log.d(TAG, "Sending tweet...");
-							if(plainPhoneNumber.equals(JAVI_PHONE)) {
-								String message = getResources().getString(R.string.javi_twitter_message);
-								twitter.updateStatus(message);
-							} else {
-								twitter.updateStatus(text.toString());
-							}
-							Log.d(TAG, "Tweet sent");
-						} catch (TwitterException e) {
-							Log.e(TAG, "Can't send Tweet");
-							e.printStackTrace();
+				if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+					Log.d(TAG, "Idle");
+				} else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+					// Incoming call
+					String incomingNumber = intent
+							.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+					Log.d(TAG, "Incoming call " + incomingNumber);
+					if(blackList.containsKey(incomingNumber)) {
+						// Telephony actions
+						if (!killCall(context)) { // Using the method defined earlier
+							Log.e(TAG, "Unable to kill incoming call");
 						}
+						Calendar calendar = Calendar.getInstance();
+						// Get relevant call info
+						String name = blackList.get(incomingNumber);
+						CharSequence text = 
+								(calendar.getTime().toString() // To avoid tweet discard 
+								+ " " 
+								+ getResources().getString(R.string.twitter_message_1)
+								+ " " + name + " " 
+								+ getResources().getString(R.string.twitter_message_2));
+						// Log actions					
+						saveLogToFile(calendar.getTime().toString() + " " + name + " " + incomingNumber+"\n");
+						// Twitter actions
+						if(isTwitterEnabled()) {
+							try {
+								Log.d(TAG, "Sending tweet...");
+								if(incomingNumber.equals(JAVI_PHONE)) {
+									String message = context.getResources().getString(R.string.javi_twitter_message);
+									twitter.updateStatus(message);
+								} else {
+									twitter.updateStatus(text.toString());
+								}
+								Log.d(TAG, "Tweet sent");
+							} catch (TwitterException e) {
+								Log.e(TAG, "Can't send Tweet");
+								e.printStackTrace();
+							}
+						}
+						// Inform user
+						UserNotification.showToastWithImage(context, text, R.drawable.app_icon);
 					}
-					// Inform user
-					UserNotification.showToastWithImage(getApplicationContext(), text, R.drawable.app_icon);
+
+				} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
+					Log.d(TAG, "Offhook");
 				}
-				break;
-
-			case TelephonyManager.CALL_STATE_IDLE:
-				Log.d(TAG, "idle");
-				break;
-
-			case TelephonyManager.CALL_STATE_OFFHOOK :
-				Log.d(TAG, "offhook");
-				break;
+			} else if (intent.getAction().equals(
+					"android.intent.action.NEW_OUTGOING_CALL")) {
+				// Outgoing call: DO NOTHING at this time
+				// String outgoingNumber = intent
+				// .getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+				// Log.d(TAG, "Outgoing call " + outgoingNumber);
+				// setResultData(null); // Kills the outgoing call
+			} else {
+				Log.e(TAG, "Unexpected intent.action=" + intent.getAction());
 			}
 		}
 	};
@@ -147,14 +145,10 @@ public class IncomingCallScanner extends Service {
 		if(!serviceRunning) {
 			Log.d(TAG, "Loading map with blacklist...");
 			loadMapFromFile();
-			tm = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE));
-			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
-			try {
-				telephonyService = getTelephonyService();
-			} catch (Exception e) {
-				Log.i(TAG, "Can't get Telephony Service");
-				e.printStackTrace();
-			}
+			IntentFilter filter = new IntentFilter();
+			filter.addAction("android.intent.action.PHONE_STATE");
+			filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
+			registerReceiver(phoneStateReceiver, filter);
 			serviceRunning = true;			
 			Log.d(TAG, "Created");
 		}
@@ -176,8 +170,7 @@ public class IncomingCallScanner extends Service {
 			saveMapToFile();
 			blackList.clear();
 			// Stop filtering calls, otherwise they'll continue to be filtered
-			tm.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE); 
-			tm = null;
+			unregisterReceiver(phoneStateReceiver);
 			UserNotification.cancelNotification(getApplicationContext(), UserNotification.SVC_STARTED_NOTIFICATION);
 			serviceRunning = false;
 			Log.d(TAG, "Stopped");
@@ -227,16 +220,6 @@ public class IncomingCallScanner extends Service {
 	}
 
 	// ------------------END Twitter Management -----------------
-
-	@SuppressWarnings("unchecked")
-	private ITelephony getTelephonyService() throws Exception {
-		// Set up communication with the telephony service (thanks to Tedd's Droid Tools!)
-		TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-		Class c = Class.forName(tm.getClass().getName());
-		Method m = c.getDeclaredMethod("getITelephony");
-		m.setAccessible(true);
-		return (ITelephony)m.invoke(tm);
-	}
 
 	private void loadMapFromFile(){
 		FileInputStream fis = null;
@@ -338,6 +321,41 @@ public class IncomingCallScanner extends Service {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public boolean killCall(Context context) {
+		try {
+			// Get the boring old TelephonyManager
+			TelephonyManager telephonyManager = (TelephonyManager) context
+					.getSystemService(Context.TELEPHONY_SERVICE);
+
+			// Get the getITelephony() method
+			Class classTelephony = Class.forName(telephonyManager.getClass()
+					.getName());
+			Method methodGetITelephony = classTelephony
+					.getDeclaredMethod("getITelephony");
+
+			// Ignore that the method is supposed to be private
+			methodGetITelephony.setAccessible(true);
+
+			// Invoke getITelephony() to get the ITelephony interface
+			Object telephonyInterface = methodGetITelephony
+					.invoke(telephonyManager);
+
+			// Get the endCall method from ITelephony
+			Class telephonyInterfaceClass = Class.forName(telephonyInterface
+					.getClass().getName());
+			Method methodEndCall = telephonyInterfaceClass
+					.getDeclaredMethod("endCall");
+
+			// Invoke endCall()
+			methodEndCall.invoke(telephonyInterface);
+
+		} catch (Exception e) { // Many things can go wrong with reflection
+			Log.e(TAG, e.toString());
+			return false;
+		}
+		return true;
 	}
 
 }
