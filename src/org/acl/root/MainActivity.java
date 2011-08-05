@@ -47,7 +47,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private static final String TAG = "MainActivity";
 	
 	private static final int PICK_CONTACT = 0;
-	private static final int GET_TWITTER_CONSUMER_DATA = 1;
+//	private static final int GET_TWITTER_CONSUMER_DATA = 1;
 	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
@@ -159,7 +159,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			}
 			break;
 		case R.id.twitter:
-			launchTwitterOAuthActivity();
+			//launchTwitterOAuthActivity();
 			break;
 		case R.id.logs:
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
@@ -190,18 +190,18 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Toast.makeText(this, "No contact was selected", Toast.LENGTH_SHORT).show();
 			}
 			break;
-		case GET_TWITTER_CONSUMER_DATA:
-			if (resultCode == Activity.RESULT_OK) {
-				twitterOAuthConsumerData = new OAuthAccessToken(
-						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_KEY),
-						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_SECRET));
-				prepareTwitterConnection();
-			}
-			break;
+//		case GET_TWITTER_CONSUMER_DATA:
+//			if (resultCode == Activity.RESULT_OK) {
+//				twitterOAuthConsumerData = new OAuthAccessToken(
+//						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_KEY),
+//						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_SECRET));
+//				prepareTwitterConnection();
+//			}
+//			break;
 		case GET_TWITTER_ACCESS_TOKEN:
 			if (resultCode == Activity.RESULT_OK) {
 				
-			    String oauthVerifier = (String) intent.getExtras().get("oauth_verifier");
+			    String oauthVerifier = (String) intent.getExtras().get(TWITTER_OAUTH_VERIFIER);
 			 
 			    try {
 			        // Pair up our request with the response
@@ -253,7 +253,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						return;
 					}
 					
-					twitterOAuthConsumerData = loadTwitterOAuthConsumerDataFromAppPreferences();
+					twitterOAuthConsumerData = new OAuthAccessToken(CONSUMER_KEY, CONSUMER_SECRET); 
+							//loadTwitterOAuthConsumerDataFromAppPreferences();
 					twitterOAuthAccessToken = loadTwitterOAuthAccessTokenFromAppPreferences();
 					
 					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
@@ -286,7 +287,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			// Step 1: Get the request token. If the consumer data is wrong a an exception will be thrown
 			twitterOAuthRequestToken = getTwitterOAuthRequestToken();
 			// Step 2: Here we can safely save Consumer Data
-			saveTwitterOAuthConsumerDataInAppPreferences(twitterOAuthConsumerData);
+			//saveTwitterOAuthConsumerDataInAppPreferences(twitterOAuthConsumerData);
 			// Step 3: Use request token to get access token by means of an intermediate activity
 			Toast.makeText(this, "Please, put your Twitter user and password", Toast.LENGTH_SHORT).show();
 			launchTwitterWebviewActivity(twitterOAuthRequestToken);
@@ -394,6 +395,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	protected static final String TWITTER_OAUTH_CONSUMER_KEY = "twitter_oauth_consumer_key";
 	protected static final String TWITTER_OAUTH_CONSUMER_SECRET = "twitter_oauth_consumer_secret";
+	protected static final String CONSUMER_KEY = "yIzfhHltaYWYNzPSW13Sg";
+	protected static final String CONSUMER_SECRET = "YFe3GkW9YfSPF7GhuRpQLEAAcKDxsG3htsw2GSrx4";
+	
+	private static final String TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
@@ -447,12 +452,12 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		return (!oauthAccessToken.getToken().equals("") && !oauthAccessToken.getTokenSecret().equals(""));
 	}
 	
-	private OAuthAccessToken loadTwitterOAuthConsumerDataFromAppPreferences() {
-		Log.d(TAG, "onClick: inTwitterOACD");
-		return new OAuthAccessToken(
-				twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_KEY, "")
-				,twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_SECRET, ""));
-	}
+//	private OAuthAccessToken loadTwitterOAuthConsumerDataFromAppPreferences() {
+//		Log.d(TAG, "onClick: inTwitterOACD");
+//		return new OAuthAccessToken(
+//				twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_KEY, "")
+//				,twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_SECRET, ""));
+//	}
 
 	private OAuthAccessToken loadTwitterOAuthAccessTokenFromAppPreferences() {
 		Log.d(TAG, "onClick: inTwitterAT");
@@ -461,13 +466,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				,twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ));
 	}
 
-	private void saveTwitterOAuthConsumerDataInAppPreferences(OAuthAccessToken consumerData) {
-		twitterPreferences.edit()
-		    .putString(TWITTER_OAUTH_CONSUMER_KEY, consumerData.getToken())
-		    .putString(TWITTER_OAUTH_CONSUMER_SECRET, consumerData.getTokenSecret())
-		    .commit();
-		Toast.makeText(this, "Twitter OAuth Consumer Data saved in Preferences", Toast.LENGTH_SHORT).show();
-	}
+//	private void saveTwitterOAuthConsumerDataInAppPreferences(OAuthAccessToken consumerData) {
+//		twitterPreferences.edit()
+//		    .putString(TWITTER_OAUTH_CONSUMER_KEY, consumerData.getToken())
+//		    .putString(TWITTER_OAUTH_CONSUMER_SECRET, consumerData.getTokenSecret())
+//		    .commit();
+//		Toast.makeText(this, "Twitter OAuth Consumer Data saved in Preferences", Toast.LENGTH_SHORT).show();
+//	}
 
 	private void saveTwitterOAuthAccessTokenInAppPreferences(AccessToken accessToken) {
 		twitterPreferences.edit()
@@ -477,10 +482,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		Toast.makeText(this, "Twitter OAuth Access Token saved in Preferences", Toast.LENGTH_SHORT).show();
 	}
 	
-	private  void launchTwitterOAuthActivity() {
-		Intent i = new Intent(this, TwitterOAuthConsumerDataActivity.class);
-		startActivityForResult(i, GET_TWITTER_CONSUMER_DATA);
-	}
+//	private  void launchTwitterOAuthActivity() {
+//		Intent i = new Intent(this, TwitterOAuthConsumerDataActivity.class);
+//		startActivityForResult(i, GET_TWITTER_CONSUMER_DATA);
+//	}
 	
 	private  void launchTwitterWebviewActivity(RequestToken twitterOAuthRequestToken) {
 		Intent i = new Intent(this, TwitterWebviewActivity.class);
