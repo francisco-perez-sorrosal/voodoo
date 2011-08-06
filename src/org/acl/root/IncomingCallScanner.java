@@ -24,6 +24,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.telephony.TelephonyManager;
@@ -47,6 +48,9 @@ public class IncomingCallScanner extends Service {
 
 	private ConcurrentMap<String, String> blackList = new InstrumentedConcurrentMap<String, String>(new ConcurrentHashMap<String, String>());
 
+	private AudioManager am;
+	private int currentAudioMode;
+	
 	private boolean serviceRunning = false;
 
 	public boolean isServiceRunning() {
@@ -54,7 +58,7 @@ public class IncomingCallScanner extends Service {
 	}
 
 	private Twitter twitter = null;
-
+	
 	/****************************************
 	 * Binder class
 	 *
@@ -80,6 +84,7 @@ public class IncomingCallScanner extends Service {
 
 				if (state.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 					Log.d(TAG, "Idle");
+					am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 					// Incoming call
 					String incomingNumber = intent
@@ -119,6 +124,8 @@ public class IncomingCallScanner extends Service {
 						}
 						// Inform user
 						UserNotification.showToastWithImage(context, text, R.drawable.app_icon);
+					} else {
+						am.setRingerMode(currentAudioMode);
 					}
 
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
@@ -145,6 +152,9 @@ public class IncomingCallScanner extends Service {
 		if(!serviceRunning) {
 			Log.d(TAG, "Loading map with blacklist...");
 			loadMapFromFile();
+			am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+			currentAudioMode = am.getRingerMode();
+			am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 			IntentFilter filter = new IntentFilter();
 			filter.addAction("android.intent.action.PHONE_STATE");
 			filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
@@ -170,6 +180,8 @@ public class IncomingCallScanner extends Service {
 			saveMapToFile();
 			blackList.clear();
 			// Stop filtering calls, otherwise they'll continue to be filtered
+			am.setRingerMode(currentAudioMode);
+			am = null;
 			unregisterReceiver(phoneStateReceiver);
 			UserNotification.cancelNotification(getApplicationContext(), UserNotification.SVC_STARTED_NOTIFICATION);
 			serviceRunning = false;
@@ -356,7 +368,7 @@ public class IncomingCallScanner extends Service {
 			return false;
 		}
 		return true;
-	}
-
+	}	
+	
 }
 
