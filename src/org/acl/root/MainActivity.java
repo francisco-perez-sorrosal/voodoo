@@ -1,5 +1,10 @@
 package org.acl.root;
 
+import static org.acl.root.TwitterOAuthConstants.*;
+
+import java.io.IOException;
+import java.util.HashMap;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -7,6 +12,11 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -22,6 +32,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,7 +42,11 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -42,21 +58,26 @@ import android.widget.ToggleButton;
  * @author Francisco PŽrez-Sorrosal (fperez)
  *
  */
-public class MainActivity extends Activity implements OnClickListener, OnItemClickListener {
+public class MainActivity extends Activity implements OnClickListener, OnItemClickListener, RadioGroup.OnCheckedChangeListener {
 
 	private static final String TAG = "MainActivity";
 	
 	private static final int PICK_CONTACT = 0;
+	private static final int GET_EMAIL_USER_DATA = 1;
 //	private static final int GET_TWITTER_CONSUMER_DATA = 1;
 	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
+	private ToggleButton emailTB;
 	private ToggleButton twitterTB;
 	private ListView filteredContactsLV;
 	private ArrayAdapter<CharSequence> filteredContactsAdapter;
 
 	private IncomingCallScanner incomingCallScanner;
 	private boolean incomingCallScannerIsBound;
+	
+	private AccountManager accountManager;
+	private HashMap<Integer, Account> emailAccounts = new HashMap<Integer, Account>();
 
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -95,6 +116,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
 
+		emailTB = (ToggleButton) findViewById(R.id.emailTB);
+		emailTB.setOnClickListener(this);
+		
 		twitterTB = (ToggleButton) findViewById(R.id.twitterTB);
 		twitterTB.setOnClickListener(this);
 
@@ -104,7 +128,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		bindService(new Intent(this, 
 				IncomingCallScanner.class), mConnection, Context.BIND_NOT_FOREGROUND);
 		
+		emailPreferences = getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
 		twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
+		
+		accountManager = AccountManager.get(getApplicationContext());
 		
 //		twitterPreferences.edit()
 //	    .putString(TWITTER_OAUTH_CONSUMER_KEY, "")
@@ -119,6 +146,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		accountManager = null;
 		// Do not call clearTwitterConnection() on destroying this activity
 		// cause if twitter is enabled messages must be sent!!!
 		// Clean incoming call scanner service connection
@@ -148,6 +176,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		return true;
 	}
 
+	private PopupWindow pw;
+			
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.contacts:			
@@ -165,6 +195,32 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);
 			break;
+		case R.id.email:
+			launchEmailUserDataActivity();
+//			Account[] accounts = getEmailAccounts();
+//			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//			View emailAccountSelectView = inflater.inflate(R.layout.email_account_selection_popup, null);
+//			pw = new PopupWindow(emailAccountSelectView, 500, 500, true);
+//			
+//			RadioGroup mRadioGroup = (RadioGroup) emailAccountSelectView.findViewById(R.id.emailSelectionRG);
+//			mRadioGroup.setOnCheckedChangeListener(this);
+//			// TODO: Fill radio group with radiobutton
+//			emailAccounts.clear();
+//			for(Account account : accounts) {
+//		        // test adding a radio button programmatically
+//		        RadioButton newRadioButton = new RadioButton(this);
+//		        newRadioButton.setText(account.name);
+//		        Log.d(TAG, Integer.toString(account.hashCode()));
+//		        newRadioButton.setId(account.hashCode());
+//		        LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
+//		                RadioGroup.LayoutParams.WRAP_CONTENT,
+//		                RadioGroup.LayoutParams.WRAP_CONTENT);
+//		        mRadioGroup.addView(newRadioButton, 0, layoutParams);
+//		        emailAccounts.put(account.hashCode(), account);
+//			}
+//			pw.showAtLocation(this.findViewById(R.id.mainLayout), Gravity.CENTER, 0, 0);
+
+			break;
 		}
 		return true;
 	}
@@ -179,6 +235,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
 					String phoneNumber = contact.getPhoneNumbers().get(0);
 					incomingCallScanner.addContactToBlackList(contact);
+					
 					filteredContactsAdapter.add(name + " (" + phoneNumber + ")");
 					filteredContactsAdapter.notifyDataSetChanged();
 					filteredContactsLV.refreshDrawableState();
@@ -198,6 +255,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 //				prepareTwitterConnection();
 //			}
 //			break;
+		case GET_EMAIL_USER_DATA:
+			if (resultCode == Activity.RESULT_OK) {
+				saveEmailUserDataInAppPreferences(
+						(String) intent.getExtras().get(EMAIL),
+						(String) intent.getExtras().get(EMAIL_PASSWORD));
+			}
+			break;
 		case GET_TWITTER_ACCESS_TOKEN:
 			if (resultCode == Activity.RESULT_OK) {
 				
@@ -235,7 +299,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onClick: service started");
 			} else {
 				Log.d(TAG, "onClick: stopping service");
-				clearTwitterConnection();
+				clearEmailConnectionFromService();
+				clearTwitterConnectionFromService();
 				stopService(new Intent(this, IncomingCallScanner.class));
 				filteredContactsAdapter.clear();
 				filteredContactsAdapter.notifyDataSetChanged();
@@ -249,7 +314,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					
 					if(!isNetworkAvailable()) {
 						Toast.makeText(this, "Network connection not available", Toast.LENGTH_SHORT).show();
-						clearTwitterConnection();
+						clearTwitterConnectionFromService();
 						return;
 					}
 					
@@ -275,7 +340,27 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					twitterTB.setChecked(false);
 				}
 			} else {
-				clearTwitterConnection();
+				clearTwitterConnectionFromService();
+			}
+			break;
+		case R.id.emailTB:
+			if(emailTB.isChecked()) {
+				if(incomingCallScannerIsBound) {
+					
+					if(!isNetworkAvailable()) {
+						Toast.makeText(this, "Network connection not available", Toast.LENGTH_SHORT).show();
+						clearEmailConnectionFromService();
+						return;
+					}
+					
+					String email = emailPreferences.getString(EMAIL, "" );
+					String password = emailPreferences.getString(EMAIL_PASSWORD, "" );
+					incomingCallScanner.setEmailConnection(
+							new MailHelper(email, password));
+					
+				}
+			} else {
+				clearEmailConnectionFromService();
 			}
 			break;
 		}
@@ -395,8 +480,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	protected static final String TWITTER_OAUTH_CONSUMER_KEY = "twitter_oauth_consumer_key";
 	protected static final String TWITTER_OAUTH_CONSUMER_SECRET = "twitter_oauth_consumer_secret";
-	protected static final String CONSUMER_KEY = "yIzfhHltaYWYNzPSW13Sg";
-	protected static final String CONSUMER_SECRET = "YFe3GkW9YfSPF7GhuRpQLEAAcKDxsG3htsw2GSrx4";
 	
 	private static final String TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	
@@ -433,7 +516,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		return new TwitterFactory(conf).getInstance();
 	}
 	
-	private void clearTwitterConnection() {
+	private void clearTwitterConnectionFromService() {
 			if(incomingCallScannerIsBound) {
 				incomingCallScanner.discardTwitterConnection();
 			}
@@ -514,5 +597,58 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			return tokenSecret;
 		}
 	}
+	
+	// ---------------------- Mail related stufff ----------------------------
+	
+	public Account[] getEmailAccounts() {
+		return  accountManager.getAccountsByType("com.google");
+	}
+	
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		Log.d(TAG, "RB Id " + checkedId);
+		Account emailAccount = emailAccounts.get(checkedId);
+		
+		AccountManagerFuture<Bundle> accountManagerFuture = accountManager.getAuthToken(emailAccount, "ah", null, this, null, null);
+		Bundle authTokenBundle;
+		try {
+			authTokenBundle = accountManagerFuture.getResult();
+			String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
+			Log.d(TAG, authToken);
+			String password = accountManager.getPassword(emailAccount);
+			Log.d(TAG, password);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		pw.dismiss();
+    }
+	
+	protected static final String EMAIL_PREFS = "email_preferences";
+	
+	protected static final String EMAIL = "email_user";
+	protected static final String EMAIL_PASSWORD = "email_password";
+
+	private  SharedPreferences emailPreferences;
+	
+	private void launchEmailUserDataActivity() {
+		Intent i = new Intent(this, EmailUserDataActivity.class);
+		startActivityForResult(i, GET_EMAIL_USER_DATA);
+	}
+
+	private void saveEmailUserDataInAppPreferences(String email, String password) {
+		emailPreferences.edit()
+		    .putString(EMAIL, email)
+		    .putString(EMAIL_PASSWORD, password)
+		    .commit();
+		Toast.makeText(this, "Email user data saved in Preferences", Toast.LENGTH_LONG).show();
+	}
+	
+	private void clearEmailConnectionFromService() {
+		if(incomingCallScannerIsBound) {
+			incomingCallScanner.discardEmailConnection();
+		}
+		emailTB.setChecked(false);
+	}
+	
+	// ---------------------- End Mail related stufff -------------------------
 	
 }

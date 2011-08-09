@@ -59,6 +59,8 @@ public class IncomingCallScanner extends Service {
 
 	private Twitter twitter = null;
 	
+	private MailHelper mail = null;
+	
 	/****************************************
 	 * Binder class
 	 *
@@ -120,6 +122,29 @@ public class IncomingCallScanner extends Service {
 							} catch (TwitterException e) {
 								Log.e(TAG, "Can't send Tweet");
 								e.printStackTrace();
+							}
+						}
+						if (isEmailEnabled()) {
+							Log.d(TAG, "Sending email...");
+							String[] toArr = { "test@gmail.com" };
+							mail.setTo(toArr);
+							mail.setFrom("no-reply@linkingenius.com");
+							mail.setSubject("Autoresponse from Blacklist Android App. SUBJECT: Call to Francisco");
+							mail.setBody("Francisco is busy at this time. Please call him late.");
+							try {
+								if (mail.send()) {
+									Toast.makeText(getApplicationContext(),
+											"Email was sent successfully.",
+											Toast.LENGTH_LONG).show();
+									Log.d(TAG, "Email sent");
+								} else {
+									Toast.makeText(getApplicationContext(),
+											"Email was not sent. Check your user and password",
+											Toast.LENGTH_LONG).show();
+									Log.d(TAG, "Email was not sent");
+								}
+							} catch (Exception e) {
+								Log.e("MailApp", "Could not send email", e);
 							}
 						}
 						// Inform user
@@ -202,7 +227,7 @@ public class IncomingCallScanner extends Service {
 	public String addContactToBlackList(Contact contact) {
 		String name = contact.getName();
 		String phone = contact.getPhoneNumbers().get(0);
-		String previousValue = blackList.putIfAbsent(phone, name);
+		String previousValue = blackList.putIfAbsent(phone, name + " (" + phone + ")");
 		Log.d(TAG, name + " " + phone + " added to Black List in service method");
 		return previousValue;
 	}
@@ -229,6 +254,24 @@ public class IncomingCallScanner extends Service {
 
 	public void discardTwitterConnection() {
 		twitter = null;
+	}
+
+	// ------------------END Twitter Management -----------------
+	
+	
+	// ------------------- Email Management -------------------
+
+	public void setEmailConnection(MailHelper newMail) {
+		Log.d(TAG, "New MailHelper reference set");
+		mail = newMail;
+	}
+
+	public boolean isEmailEnabled() {
+		return (mail != null);
+	}
+
+	public void discardEmailConnection() {
+		mail = null;
 	}
 
 	// ------------------END Twitter Management -----------------

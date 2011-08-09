@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mainLayout"
 	android:background="@color/background"
     android:orientation="vertical"
     android:layout_width="fill_parent"
@@ -12,7 +13,7 @@
         <TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:baselineAligned="false" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout1">
                 <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:layout_height="wrap_content" android:text="@string/email_enabled" android:layout_weight="1" android:id="@+id/textView4" android:textStyle="italic"></TextView>
-                <ToggleButton android:layout_width="wrap_content" android:id="@+id/toggleButton1" android:text="ToggleButton" android:layout_height="wrap_content" android:layout_weight="1"></ToggleButton>
+                <ToggleButton android:layout_width="wrap_content" android:id="@+id/emailTB" android:text="ToggleButton" android:layout_height="wrap_content" android:layout_weight="1"></ToggleButton>
                 <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="wrap_content" android:layout_gravity="center_vertical" android:layout_height="wrap_content" android:text="@string/twitter_enabled" android:layout_weight="1" android:id="@+id/textView3" android:textStyle="italic"></TextView>
                 <ToggleButton android:layout_width="wrap_content" android:id="@+id/twitterTB" android:text="ToggleButton" android:layout_height="wrap_content" android:layout_weight="1"></ToggleButton>
             </LinearLayout>

@@ -12,6 +12,8 @@
 
     <!-- Email related strings -->    
     <string name="email_enabled">E-mail caller?</string>
+    <string name="email_name">GMail User Data</string>
+    <string name="email_wrong_user_data">You must enter your GMail user and password</string>
     
     <!-- Twitter related strings -->
     <string name="twitter_enabled">Tweet calls?</string>
