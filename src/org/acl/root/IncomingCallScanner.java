@@ -48,6 +48,8 @@ public class IncomingCallScanner extends Service {
 
 	private ConcurrentMap<String, String> blackList = new InstrumentedConcurrentMap<String, String>(new ConcurrentHashMap<String, String>());
 
+	private boolean filterAllCalls = false;
+	
 	private AudioManager am;
 	private int currentAudioMode;
 	
@@ -92,7 +94,7 @@ public class IncomingCallScanner extends Service {
 					String incomingNumber = intent
 							.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 					Log.d(TAG, "Incoming call " + incomingNumber);
-					if(blackList.containsKey(incomingNumber)) {
+					if(filterAllCalls || blackList.containsKey(incomingNumber)) {
 						// Telephony actions
 						if (!killCall(context)) { // Using the method defined earlier
 							Log.e(TAG, "Unable to kill incoming call");
@@ -411,7 +413,15 @@ public class IncomingCallScanner extends Service {
 			return false;
 		}
 		return true;
-	}	
+	}
+
+	public void filterAllCalls(boolean decission) {
+		filterAllCalls = decission;
+	}
+	
+	public boolean isAllCallsFilterEnabled() {
+		return (filterAllCalls == true);
+	}
 	
 }
 

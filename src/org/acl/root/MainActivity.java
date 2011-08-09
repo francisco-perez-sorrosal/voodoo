@@ -42,6 +42,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -68,6 +69,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
+	private CheckBox filterAllCB;
 	private ToggleButton emailTB;
 	private ToggleButton twitterTB;
 	private ListView filteredContactsLV;
@@ -91,6 +93,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 				incomingCallScannerIsBound = true;
+				if(incomingCallScanner.isAllCallsFilterEnabled())
+					filterAllCB.setChecked(true);
+				if(incomingCallScanner.isEmailEnabled())
+					emailTB.setChecked(true);
 				if(incomingCallScanner.isTwitterEnabled())
 					twitterTB.setChecked(true);
 			} else {
@@ -115,6 +121,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
+		
+		filterAllCB = (CheckBox) findViewById(R.id.filterAllCB);
+		filterAllCB.setOnClickListener(this);
 
 		emailTB = (ToggleButton) findViewById(R.id.emailTB);
 		emailTB.setOnClickListener(this);
@@ -299,6 +308,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onClick: service started");
 			} else {
 				Log.d(TAG, "onClick: stopping service");
+				clearFilterForAllCallsFromService();
 				clearEmailConnectionFromService();
 				clearTwitterConnectionFromService();
 				stopService(new Intent(this, IncomingCallScanner.class));
@@ -306,6 +316,19 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 				Log.d(TAG, "onClick: service stopped");
+			}
+			break;
+		case R.id.filterAllCB:
+			if(filterAllCB.isChecked()) {
+				if(incomingCallScannerIsBound) {
+					incomingCallScanner.filterAllCalls(true);
+				} else {
+					filterAllCB.setChecked(false);
+				}
+			} else {				
+				if(incomingCallScannerIsBound) {
+					clearFilterForAllCallsFromService();
+				} 
 			}
 			break;
 		case R.id.twitterTB:
@@ -364,6 +387,11 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			}
 			break;
 		}
+	}
+
+	private void clearFilterForAllCallsFromService() {
+		incomingCallScanner.filterAllCalls(false);
+		filterAllCB.setChecked(false);
 	}
 
 	// Get the required elements to get a Twitter connection

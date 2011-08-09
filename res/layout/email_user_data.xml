@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/background"
+  android:orientation="vertical"
+  android:layout_width="match_parent" android:weightSum="1" android:layout_height="match_parent">
+    <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/textView3" android:text="@string/email_name" android:layout_width="match_parent" android:textStyle="bold" android:layout_gravity="center_vertical" android:gravity="center"></TextView>
+    <TableLayout android:id="@+id/tableLayout1" android:layout_width="match_parent" android:layout_weight="0.22" android:layout_height="wrap_content">
+        <View android:layout_marginBottom="5dip" android:background="#DDFFDD" android:layout_marginTop="5dip" android:layout_height="2px"></View>
+        <TableRow android:layout_height="match_parent" android:id="@+id/tableRow1" android:layout_width="match_parent">
+            <TextView android:textAppearance="?android:attr/textAppearanceMedium" android:textStyle="italic" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="User email" android:id="@+id/textView1"></TextView>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/tableRow2">
+            <EditText android:id="@+id/emailT" android:layout_height="wrap_content" android:layout_width="match_parent"></EditText>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/tableRow3">
+            <TextView android:layout_width="match_parent" android:textAppearance="?android:attr/textAppearanceMedium" android:textStyle="italic" android:layout_height="wrap_content" android:text="Password" android:id="@+id/textView2"></TextView>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/tableRow4">
+            <EditText android:inputType="textPassword" android:id="@+id/emailPasswordT" android:layout_height="wrap_content" android:layout_width="wrap_content"></EditText>
+        </TableRow>
+        <View android:layout_marginBottom="5dip" android:background="#DDFFDD" android:layout_height="2px" android:layout_marginTop="5dip"></View>
+    </TableLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1">
+        <Button android:id="@+id/emailDoneB" android:layout_width="wrap_content" android:text="Done" android:layout_height="wrap_content"></Button>
+        <Button android:id="@+id/emailClearB" android:layout_width="wrap_content" android:text="Clear" android:layout_height="wrap_content"></Button>
+    </LinearLayout>
+</LinearLayout>

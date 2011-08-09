@@ -9,6 +9,7 @@
     <string name="ics_service_started">Incoming Call Scanner started</string>    
     <string name="ics_service_stopped">Incoming Call Scanner has been stopped</string>
     <string name="filtered_contacts">Filtered Contacts</string>
+    <string name="filter_all_calls">Filter all incoming calls?</string>
 
     <!-- Email related strings -->    
     <string name="email_enabled">E-mail caller?</string>
