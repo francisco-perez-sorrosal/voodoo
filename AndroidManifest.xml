@@ -27,7 +27,7 @@
 		<service android:enabled="true" android:name=".IncomingCallScanner" />
 		<activity android:name=".ShowLogActivity" />
 		<activity android:name=".EmailUserDataActivity" />
-		<activity android:name=".TwitterOAuthConsumerDataActivity" />
+		<activity android:name=".TwitterConfigurationActivity" />
 		<activity android:name=".TwitterWebviewActivity" />
 	</application>
 </manifest>

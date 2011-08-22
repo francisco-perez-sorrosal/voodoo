@@ -1,22 +1,12 @@
 package org.acl.root;
 
-import static org.acl.root.TwitterOAuthConstants.*;
-
-import java.io.IOException;
-import java.util.HashMap;
-
+import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
+import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -32,8 +22,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,11 +31,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -59,13 +43,12 @@ import android.widget.ToggleButton;
  * @author Francisco PŽrez-Sorrosal (fperez)
  *
  */
-public class MainActivity extends Activity implements OnClickListener, OnItemClickListener, RadioGroup.OnCheckedChangeListener {
+public class MainActivity extends Activity implements OnClickListener, OnItemClickListener {
 
 	private static final String TAG = "MainActivity";
 	
 	private static final int PICK_CONTACT = 0;
 	private static final int GET_EMAIL_USER_DATA = 1;
-//	private static final int GET_TWITTER_CONSUMER_DATA = 1;
 	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
@@ -78,9 +61,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private IncomingCallScanner incomingCallScanner;
 	private boolean incomingCallScannerIsBound;
 	
-	private AccountManager accountManager;
-	private HashMap<Integer, Account> emailAccounts = new HashMap<Integer, Account>();
-
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
@@ -88,16 +68,18 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onServiceConnected: " + incomingCallScanner.isServiceRunning());
 				startStopTB.setChecked(true);
 				filteredContactsAdapter = new ArrayAdapter<CharSequence>(getApplicationContext(),
-						android.R.layout.simple_list_item_1, incomingCallScanner.getBlackList());
+						android.R.layout.simple_list_item_1, BlackList.INSTANCE.getBlackListAsArrayList());
 				filteredContactsLV.setAdapter(filteredContactsAdapter);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 				incomingCallScannerIsBound = true;
 				if(incomingCallScanner.isAllCallsFilterEnabled())
 					filterAllCB.setChecked(true);
-				if(incomingCallScanner.isEmailEnabled())
+				if(incomingCallScanner.containsObserver(
+						MailHelper.getInstance(getApplicationContext())))
 					emailTB.setChecked(true);
-				if(incomingCallScanner.isTwitterEnabled())
+				if(incomingCallScanner.containsObserver(
+						TwitterHelper.getInstance(getApplicationContext())))
 					twitterTB.setChecked(true);
 			} else {
 				Log.d(TAG, "onServiceConnected: IncomingCallScanner is null");
@@ -140,22 +122,12 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		emailPreferences = getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
 		twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
 		
-		accountManager = AccountManager.get(getApplicationContext());
-		
-//		twitterPreferences.edit()
-//	    .putString(TWITTER_OAUTH_CONSUMER_KEY, "")
-//	    .putString(TWITTER_OAUTH_CONSUMER_SECRET, "")
-//	    .putString(TWITTER_OAUTH_ACCESS_TOKEN, "")
-//	    .putString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "")
-//	    .commit();
-		
 		Log.d(TAG, "onCreate");
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		accountManager = null;
 		// Do not call clearTwitterConnection() on destroying this activity
 		// cause if twitter is enabled messages must be sent!!!
 		// Clean incoming call scanner service connection
@@ -184,8 +156,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		inflater.inflate(R.menu.mainmenu, menu);
 		return true;
 	}
-
-	private PopupWindow pw;
 			
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -198,7 +168,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			}
 			break;
 		case R.id.twitter:
-			//launchTwitterOAuthActivity();
+			launchTwitterConfigurationActivity();
 			break;
 		case R.id.logs:
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
@@ -206,29 +176,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			break;
 		case R.id.email:
 			launchEmailUserDataActivity();
-//			Account[] accounts = getEmailAccounts();
-//			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//			View emailAccountSelectView = inflater.inflate(R.layout.email_account_selection_popup, null);
-//			pw = new PopupWindow(emailAccountSelectView, 500, 500, true);
-//			
-//			RadioGroup mRadioGroup = (RadioGroup) emailAccountSelectView.findViewById(R.id.emailSelectionRG);
-//			mRadioGroup.setOnCheckedChangeListener(this);
-//			// TODO: Fill radio group with radiobutton
-//			emailAccounts.clear();
-//			for(Account account : accounts) {
-//		        // test adding a radio button programmatically
-//		        RadioButton newRadioButton = new RadioButton(this);
-//		        newRadioButton.setText(account.name);
-//		        Log.d(TAG, Integer.toString(account.hashCode()));
-//		        newRadioButton.setId(account.hashCode());
-//		        LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
-//		                RadioGroup.LayoutParams.WRAP_CONTENT,
-//		                RadioGroup.LayoutParams.WRAP_CONTENT);
-//		        mRadioGroup.addView(newRadioButton, 0, layoutParams);
-//		        emailAccounts.put(account.hashCode(), account);
-//			}
-//			pw.showAtLocation(this.findViewById(R.id.mainLayout), Gravity.CENTER, 0, 0);
-
 			break;
 		}
 		return true;
@@ -236,6 +183,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		switch(requestCode) {
+		
 		case PICK_CONTACT:
 			if(intent != null) { // This is required because the user cannot select any contact
 				Contact  contact = getContactInfo(intent);
@@ -243,7 +191,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
 					String phoneNumber = contact.getPhoneNumbers().get(0);
-					incomingCallScanner.addContactToBlackList(contact);
+					BlackList.INSTANCE.addContactToBlackList(contact);
 					
 					filteredContactsAdapter.add(name + " (" + phoneNumber + ")");
 					filteredContactsAdapter.notifyDataSetChanged();
@@ -256,14 +204,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Toast.makeText(this, "No contact was selected", Toast.LENGTH_SHORT).show();
 			}
 			break;
-//		case GET_TWITTER_CONSUMER_DATA:
-//			if (resultCode == Activity.RESULT_OK) {
-//				twitterOAuthConsumerData = new OAuthAccessToken(
-//						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_KEY),
-//						(String) intent.getExtras().get(TWITTER_OAUTH_CONSUMER_SECRET));
-//				prepareTwitterConnection();
-//			}
-//			break;
+			
 		case GET_EMAIL_USER_DATA:
 			if (resultCode == Activity.RESULT_OK) {
 				saveEmailUserDataInAppPreferences(
@@ -271,6 +212,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						(String) intent.getExtras().get(EMAIL_PASSWORD));
 			}
 			break;
+			
 		case GET_TWITTER_ACCESS_TOKEN:
 			if (resultCode == Activity.RESULT_OK) {
 				
@@ -342,17 +284,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					}
 					
 					twitterOAuthConsumerData = new OAuthAccessToken(CONSUMER_KEY, CONSUMER_SECRET); 
-							//loadTwitterOAuthConsumerDataFromAppPreferences();
 					twitterOAuthAccessToken = loadTwitterOAuthAccessTokenFromAppPreferences();
 					
 					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
 							&& isTwitterOAuthAccessTokenValid(twitterOAuthAccessToken)) {
 						
-						// Both values were stored properly, so get Twitter connection
-						AccessToken realTwitterOAuthAccessToken = 
-								new AccessToken(twitterOAuthAccessToken.getToken(), twitterOAuthAccessToken.getTokenSecret());						
-						Twitter twitterConnection = getTwitterConnection(twitterOAuthConsumerData, realTwitterOAuthAccessToken);
-						incomingCallScanner.setTwitterConnection(twitterConnection);
+						// Both values were stored properly, so...
+						incomingCallScanner.addCallObserver(TwitterHelper.getInstance(getApplicationContext()));
 						
 					} else {
 						
@@ -375,12 +313,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						clearEmailConnectionFromService();
 						return;
 					}
-					
-					String email = emailPreferences.getString(EMAIL, "" );
-					String password = emailPreferences.getString(EMAIL_PASSWORD, "" );
-					incomingCallScanner.setEmailConnection(
-							new MailHelper(email, password));
-					
+					incomingCallScanner.addCallObserver(MailHelper.getInstance(getApplicationContext()));
+				} else {
+					emailTB.setChecked(false);
 				}
 			} else {
 				clearEmailConnectionFromService();
@@ -399,9 +334,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		try {
 			// Step 1: Get the request token. If the consumer data is wrong a an exception will be thrown
 			twitterOAuthRequestToken = getTwitterOAuthRequestToken();
-			// Step 2: Here we can safely save Consumer Data
-			//saveTwitterOAuthConsumerDataInAppPreferences(twitterOAuthConsumerData);
-			// Step 3: Use request token to get access token by means of an intermediate activity
+			// Step 2: Use request token to get access token by means of an intermediate activity
 			Toast.makeText(this, "Please, put your Twitter user and password", Toast.LENGTH_SHORT).show();
 			launchTwitterWebviewActivity(twitterOAuthRequestToken);
 		} catch (TwitterException e) {
@@ -423,7 +356,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			public void onClick(DialogInterface dialog, int which) {
 				String phone = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
 				Log.d(TAG, "onItemClick: removing " + phone);
-				incomingCallScanner.removeContactFromBlackList(phone);
+				BlackList.INSTANCE.removeContactFromBlackList(phone);
 				filteredContactsAdapter.remove(info);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
@@ -514,6 +447,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
 	
+	protected static final String TWITTER_MESSAGE = "twitter_message";
+	
 	private  SharedPreferences twitterPreferences;
 	
 	private Twitter twitter;
@@ -531,22 +466,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		// This can throw TwitterException if the oauthConsumerData is not correct
         return twitter.getOAuthRequestToken(callbackURL);
 	}
-	
-	private Twitter getTwitterConnection(OAuthAccessToken oauthConsumerData, AccessToken twitterAccessToken) {
 		
-		Configuration conf = new ConfigurationBuilder()
-	    .setOAuthConsumerKey(oauthConsumerData.getToken())
-	    .setOAuthConsumerSecret(oauthConsumerData.getTokenSecret())
-	    .setOAuthAccessToken(twitterAccessToken.getToken())
-	    .setOAuthAccessTokenSecret(twitterAccessToken.getTokenSecret())
-	    .build();
-	 
-		return new TwitterFactory(conf).getInstance();
-	}
-	
 	private void clearTwitterConnectionFromService() {
 			if(incomingCallScannerIsBound) {
-				incomingCallScanner.discardTwitterConnection();
+				incomingCallScanner.removeCallObserver(TwitterHelper.getInstance(this));
 			}
 			twitterOAuthConsumerData = null;
 			twitterOAuthRequestToken = null;
@@ -563,27 +486,12 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		return (!oauthAccessToken.getToken().equals("") && !oauthAccessToken.getTokenSecret().equals(""));
 	}
 	
-//	private OAuthAccessToken loadTwitterOAuthConsumerDataFromAppPreferences() {
-//		Log.d(TAG, "onClick: inTwitterOACD");
-//		return new OAuthAccessToken(
-//				twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_KEY, "")
-//				,twitterPreferences.getString(TWITTER_OAUTH_CONSUMER_SECRET, ""));
-//	}
-
 	private OAuthAccessToken loadTwitterOAuthAccessTokenFromAppPreferences() {
 		Log.d(TAG, "onClick: inTwitterAT");
 		return new OAuthAccessToken(
 				twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" )
 				,twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ));
 	}
-
-//	private void saveTwitterOAuthConsumerDataInAppPreferences(OAuthAccessToken consumerData) {
-//		twitterPreferences.edit()
-//		    .putString(TWITTER_OAUTH_CONSUMER_KEY, consumerData.getToken())
-//		    .putString(TWITTER_OAUTH_CONSUMER_SECRET, consumerData.getTokenSecret())
-//		    .commit();
-//		Toast.makeText(this, "Twitter OAuth Consumer Data saved in Preferences", Toast.LENGTH_SHORT).show();
-//	}
 
 	private void saveTwitterOAuthAccessTokenInAppPreferences(AccessToken accessToken) {
 		twitterPreferences.edit()
@@ -593,15 +501,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		Toast.makeText(this, "Twitter OAuth Access Token saved in Preferences", Toast.LENGTH_SHORT).show();
 	}
 	
-//	private  void launchTwitterOAuthActivity() {
-//		Intent i = new Intent(this, TwitterOAuthConsumerDataActivity.class);
-//		startActivityForResult(i, GET_TWITTER_CONSUMER_DATA);
-//	}
-	
 	private  void launchTwitterWebviewActivity(RequestToken twitterOAuthRequestToken) {
 		Intent i = new Intent(this, TwitterWebviewActivity.class);
 		i.putExtra("URL", twitterOAuthRequestToken.getAuthenticationURL());
 		startActivityForResult(i, GET_TWITTER_ACCESS_TOKEN);
+	}
+
+	private  void launchTwitterConfigurationActivity() {
+		Intent i = new Intent(this, TwitterConfigurationActivity.class);
+		startActivity(i);
 	}
 
 	// ----------------------- To Store Twitter Tokens ------------------------
@@ -626,29 +534,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		}
 	}
 	
-	// ---------------------- Mail related stufff ----------------------------
-	
-	public Account[] getEmailAccounts() {
-		return  accountManager.getAccountsByType("com.google");
-	}
-	
-	public void onCheckedChanged(RadioGroup group, int checkedId) {
-		Log.d(TAG, "RB Id " + checkedId);
-		Account emailAccount = emailAccounts.get(checkedId);
-		
-		AccountManagerFuture<Bundle> accountManagerFuture = accountManager.getAuthToken(emailAccount, "ah", null, this, null, null);
-		Bundle authTokenBundle;
-		try {
-			authTokenBundle = accountManagerFuture.getResult();
-			String authToken = authTokenBundle.get(AccountManager.KEY_AUTHTOKEN).toString();
-			Log.d(TAG, authToken);
-			String password = accountManager.getPassword(emailAccount);
-			Log.d(TAG, password);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		pw.dismiss();
-    }
+	// ---------------------- Mail related stuff ----------------------------
 	
 	protected static final String EMAIL_PREFS = "email_preferences";
 	
@@ -672,11 +558,11 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	private void clearEmailConnectionFromService() {
 		if(incomingCallScannerIsBound) {
-			incomingCallScanner.discardEmailConnection();
+			incomingCallScanner.removeCallObserver(MailHelper.getInstance(this));
 		}
 		emailTB.setChecked(false);
 	}
 	
-	// ---------------------- End Mail related stufff -------------------------
+	// ---------------------- End Mail related stuff -------------------------
 	
 }

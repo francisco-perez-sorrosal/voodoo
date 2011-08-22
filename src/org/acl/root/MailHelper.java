@@ -19,8 +19,30 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-public class MailHelper extends Authenticator {
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 
+public class MailHelper extends Authenticator implements CallObserver {
+
+	private static final String TAG = "MailHelper";
+	private static final String DEFAULT_FROM_EMAIL = "no-reply@linkingenius.com";
+	private static final String DEFAULT_SUBJECT = "Autoresponse from Blacklist Android App";
+
+	protected static final String EMAIL_PREFS = "email_preferences";
+	
+	protected static final String EMAIL = "email_user";
+	protected static final String EMAIL_PASSWORD = "email_password";
+	
+	public static  MailHelper instance;
+	
+	public static MailHelper getInstance(Context context) {
+		if(instance == null)
+			instance = new MailHelper(context);
+		return instance;
+	}
+	
 	private String user;
 	private String password;
 	private String[] to;
@@ -45,7 +67,15 @@ public class MailHelper extends Authenticator {
 	 * http://www.jondev.net/articles/Sending_Emails_without_User_Intervention_
 	 * %28no_Intents%29_in_Android
 	 */
-	public MailHelper() {
+	private MailHelper(Context context) {
+		
+		Log.d(TAG, "Constructor");
+		SharedPreferences emailPreferences = 
+				context.getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
+		
+		user = emailPreferences.getString(EMAIL, "" );
+		password = emailPreferences.getString(EMAIL_PASSWORD, "" );
+		
 		host = "smtp.gmail.com"; // default smtp server
 		port = "465"; // default smtp port
 		sport = "465"; // default socketfactory port
@@ -72,12 +102,12 @@ public class MailHelper extends Authenticator {
 		CommandMap.setDefaultCommandMap(mc);
 	}
 
-	public MailHelper(String user, String pass) {
-		this();
-
-		this.user = user;
-		this.password = pass;
-	}
+//	public MailHelper(String user, String pass) {
+//		this();
+//
+//		this.user = user;
+//		this.password = pass;
+//	}
 
 	public boolean send() throws Exception {
 		Properties props = setMailProperties();
@@ -154,20 +184,45 @@ public class MailHelper extends Authenticator {
 
 	// The getters and setters
 	
-	public void setTo(String[] toArr) {
+	private void setTo(String[] toArr) {
 		this.to = toArr;
 	}
 
-	public void setFrom(String string) {
+	private void setFrom(String string) {
 		this.from = string;
 	}
 
-	public void setSubject(String string) {
+	private void setSubject(String string) {
 		this.subject = string;
 	}
 	
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	/**
+	 * Observer pattern for incoming calls
+	 */
+	@Override
+	public void callNotification(CallInfo callInfo) {
+		String email = callInfo.getEmail();
+		if(email != null) {
+			Log.d(TAG, "Sending email...");
+			String[] toArr = { callInfo.getEmail() };
+			setTo(toArr);
+			setFrom(DEFAULT_FROM_EMAIL);
+			setSubject(DEFAULT_SUBJECT);
+			setBody("Francisco is busy at this time. Please call him late.");
+			try {
+				if (send()) {
+					Log.d(TAG, "Email sent.");
+				} else {
+					Log.d(TAG, "Email was not sent.");
+				}
+			} catch (Exception e) {
+				Log.e(TAG, "Could not send email", e);
+			}
+		}
 	}
 
 }

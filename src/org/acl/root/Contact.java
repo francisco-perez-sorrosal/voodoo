@@ -1,5 +1,8 @@
 package org.acl.root;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -11,6 +14,8 @@ import java.util.ArrayList;
  *
  */
 public class Contact implements Serializable {
+	
+	private static final long serialVersionUID = 83472973490823798L ;
 	
 	private String id;
 	private String name;
@@ -108,4 +113,13 @@ public class Contact implements Serializable {
 	public ArrayList<String> getPhoneNumbers() {
 		return phoneNumbers;
 	}
+	
+	private void writeObject(ObjectOutputStream s) throws IOException {
+		s.defaultWriteObject();
+	}
+
+	private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
+		s.defaultReadObject();
+	}
+
 }
