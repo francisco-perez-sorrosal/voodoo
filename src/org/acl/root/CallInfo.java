@@ -1,19 +1,34 @@
 package org.acl.root;
 
+import java.util.ArrayList;
 import java.util.Date;
 
+import android.content.Context;
+
+/**
+ * Used to pass information related to incoming calls to observers
+ * 
+ * @author Francisco PŽrez-Sorrosal (fperez)
+ *
+ */
 public class CallInfo {
 	
+	private final Context context;
 	private final Date date;
 	private final String caller;
 	private final String callNumber;
-	private final String email;
+	private final ArrayList<String> emailAddresses;
 
-	public CallInfo(Date date, String caller, String callNumber, String email) {
+	public CallInfo(Context context, Date date, String caller, String callNumber, ArrayList<String> email) {
+		this.context = context;
 		this.date = date;
 		this.caller = caller;
 		this.callNumber = callNumber;
-		this.email = email;
+		this.emailAddresses = email;
+	}
+	
+	public Context getContext() {
+		return context;
 	}
 	
 	public String getDate() {
@@ -28,8 +43,8 @@ public class CallInfo {
 		return callNumber;
 	}
 
-	public String getEmail() {
-		return email;
+	public ArrayList<String> getEmailAddresses() {
+		return emailAddresses;
 	}
 	
 }

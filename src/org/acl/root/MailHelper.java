@@ -1,5 +1,6 @@
 package org.acl.root;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -23,6 +24,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MailHelper extends Authenticator implements CallObserver {
 
@@ -59,8 +61,7 @@ public class MailHelper extends Authenticator implements CallObserver {
 
 	private boolean debuggable;
 
-	/*
-	 * 
+	/**
 	 * First version of MailHelper.
 	 * 
 	 * Check this for more info:
@@ -80,8 +81,6 @@ public class MailHelper extends Authenticator implements CallObserver {
 		port = "465"; // default smtp port
 		sport = "465"; // default socketfactory port
 
-		user = ""; // username
-		password = ""; // password
 		from = ""; // email sent from
 		subject = ""; // email subject
 		body = ""; // email body
@@ -102,16 +101,9 @@ public class MailHelper extends Authenticator implements CallObserver {
 		CommandMap.setDefaultCommandMap(mc);
 	}
 
-//	public MailHelper(String user, String pass) {
-//		this();
-//
-//		this.user = user;
-//		this.password = pass;
-//	}
-
 	public boolean send() throws Exception {
 		Properties props = setMailProperties();
-
+		
 		if (!user.equals("") && !password.equals("") && to.length > 0
 				&& !from.equals("") && !subject.equals("") && !body.equals("")) {
 			Session session = Session.getInstance(props, this);
@@ -205,10 +197,11 @@ public class MailHelper extends Authenticator implements CallObserver {
 	 */
 	@Override
 	public void callNotification(CallInfo callInfo) {
-		String email = callInfo.getEmail();
-		if(email != null) {
-			Log.d(TAG, "Sending email...");
-			String[] toArr = { callInfo.getEmail() };
+		ArrayList<String> emailAddresses = callInfo.getEmailAddresses();
+		if(emailAddresses.size() > 0) {
+			Log.d(TAG, "Sending email to " + emailAddresses.toString());
+			String[] toArr = new String[emailAddresses.size()];
+			emailAddresses.toArray(toArr);
 			setTo(toArr);
 			setFrom(DEFAULT_FROM_EMAIL);
 			setSubject(DEFAULT_SUBJECT);
@@ -222,6 +215,8 @@ public class MailHelper extends Authenticator implements CallObserver {
 			} catch (Exception e) {
 				Log.e(TAG, "Could not send email", e);
 			}
+		} else {
+			Toast.makeText(callInfo.getContext(), R.string.no_email_addresses_found, Toast.LENGTH_SHORT).show();
 		}
 	}
 

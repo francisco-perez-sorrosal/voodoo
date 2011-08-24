@@ -1,13 +1,11 @@
 package org.acl.root;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,7 +15,6 @@ import org.acl.root.utils.InstrumentedConcurrentMap;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.Toast;
 
 public enum BlackList {
 	
@@ -27,25 +24,33 @@ public enum BlackList {
 	
 	private static final String FILE = "blacklist.txt";
 	
-	private ConcurrentMap<String, String> blackList = 
-			new InstrumentedConcurrentMap<String, String>(
-					new ConcurrentHashMap<String, String>());
+	private ConcurrentMap<String, Contact> blackList = 
+			new InstrumentedConcurrentMap<String, Contact>(
+					new ConcurrentHashMap<String, Contact>());
 	
-	public ArrayList<CharSequence> getBlackListAsArrayList() {
-		return  new ArrayList<CharSequence>(blackList.values());
+	public ArrayList<Contact> getBlackListAsArrayList() {
+		return  new ArrayList<Contact>(blackList.values());
 	}
 
-	public String addContactToBlackList(Contact contact) {
+	public Contact addContactToBlackList(Contact contact) {
+		Contact previousValue = null;
 		String name = contact.getName();
-		String phone = contact.getPhoneNumbers().get(0);
-		String previousValue = blackList.putIfAbsent(phone, name + " (" + phone + ")");
-		Log.d(TAG, name + " " + phone + " added to Black List in service method");
+		
+		for(String phone : contact.getPhoneNumbers()) {
+			previousValue = blackList.putIfAbsent(phone, contact);
+			Log.d(TAG, name + " " + phone + " added to Black List");
+		}
 		return previousValue;
 	}
 
-	public String removeContactFromBlackList(String key) {
-		String previousValue = blackList.remove(key);
-		Log.d(TAG, previousValue + " removed from Black List in service method");
+	public Contact removeContactFromBlackList(Contact contact) {
+		Contact previousValue = null;
+		String name = contact.getName();
+		
+		for(String phone : contact.getPhoneNumbers()) {
+			previousValue = blackList.remove(phone);
+			Log.d(TAG, name + " " + phone + " removed from Black List");
+		}
 		return previousValue;
 	}
 	
@@ -53,38 +58,36 @@ public enum BlackList {
 		return blackList.containsKey(contact);
 	}
 	
-	public String getContact(String contact) {
+	public Contact getContact(String contact) {
 		return blackList.get(contact);
 	}
 	
 	public void loadMapFromFile(Context context){
 		FileInputStream fis = null;
-		InputStreamReader inputreader = null;
-		BufferedReader buffreader = null;
-		
+		ObjectInputStream ois = null;
+
 		try {
 			fis = context.openFileInput(FILE);
-			inputreader = new InputStreamReader(fis);
-			buffreader = new BufferedReader(inputreader);
-
-			String line;
-
-			// read every line of the file into the line-variable, on line at the time
-			while ((line = buffreader.readLine()) != null) {
-				// do something with the settings from the file
-				Log.d(TAG, "Reading " + line);
-				String [] data = line.split("-");	
-				blackList.putIfAbsent(data[0], data[1]);
+			ois = new ObjectInputStream(fis);
+			
+			Contact contact;
+			
+			int size = ois.readInt(); //restore how many contacts  
+			for(int i=0; i < size; i++)  {
+			   contact = (Contact) ois.readObject();
+			   Log.d(TAG, "Reading " + contact);
+			   blackList.putIfAbsent(contact.getPhoneNumbers().get(0), contact);
 			}
 			Log.i(TAG, "Blacklist read");
 		} catch (FileNotFoundException e) { 
 			Log.e(TAG, "File Still not created", e);
 		} catch (IOException e) {
 			Log.e(TAG, "IOException", e);
+		} catch (ClassNotFoundException e) {
+			Log.e(TAG, "ClassNotFoundException", e);
 		} finally {
 			try {
-				if(buffreader != null) buffreader.close();
-				if(inputreader != null) inputreader.close();
+				if(ois != null) ois.close();
 				if(fis != null) fis.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -94,19 +97,16 @@ public enum BlackList {
 
 	public void saveMapToFile(Context context) {
 		FileOutputStream fos = null;
-		OutputStreamWriter outputwriter = null;
-		BufferedWriter buffwriter = null;
+		ObjectOutputStream oos = null;
 
 		try {
 			fos = context.openFileOutput(FILE, Context.MODE_PRIVATE);
+			oos =  new ObjectOutputStream(fos);
 
-			outputwriter = new OutputStreamWriter(fos);
-			buffwriter = new BufferedWriter(outputwriter);
-
-			for (Map.Entry<String, String> entry : blackList.entrySet()) {
-				String data = entry.getKey() + "-" + entry.getValue() + "\n";
-				Log.d(TAG, "Writting " + data);
-				buffwriter.write(data);
+			oos.writeInt(blackList.entrySet().size());
+			for (Map.Entry<String, Contact> entry : blackList.entrySet()) {
+				Log.d(TAG, "Writting " + entry.getValue());
+				oos.writeObject(entry.getValue());
 			}
 			Log.i(TAG, "Blacklist saved");
 		} catch (FileNotFoundException e) {
@@ -115,8 +115,7 @@ public enum BlackList {
 			Log.e(TAG, "IOException", e);
 		} finally {
 			try {
-				if (buffwriter != null) buffwriter.close();
-				if (outputwriter != null) outputwriter.close();
+				if (oos != null) oos.close();
 				if (fos != null) fos.close();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -28,7 +28,7 @@ public class TwitterHelper implements CallObserver {
 	
 	private static TwitterHelper instance;
 	
-	private String tweet = "";
+	private String tweet = "Sorry, the person you are trying to communicate with is busy";
 	
 	private Twitter twitter = null;
 	

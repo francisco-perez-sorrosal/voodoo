@@ -114,12 +114,21 @@ public class Contact implements Serializable {
 		return phoneNumbers;
 	}
 	
+	public ArrayList<String> getEmailAddresses() {
+		return emailAddresses;
+	}
+
 	private void writeObject(ObjectOutputStream s) throws IOException {
 		s.defaultWriteObject();
 	}
 
 	private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
 		s.defaultReadObject();
+	}
+	
+	@Override
+	public String toString() {
+		return getName() + " " + getPhoneNumbers();
 	}
 
 }

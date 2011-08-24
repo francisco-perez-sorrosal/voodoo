@@ -56,7 +56,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private ToggleButton emailTB;
 	private ToggleButton twitterTB;
 	private ListView filteredContactsLV;
-	private ArrayAdapter<CharSequence> filteredContactsAdapter;
+	private ArrayAdapter<Contact> filteredContactsAdapter;
 
 	private IncomingCallScanner incomingCallScanner;
 	private boolean incomingCallScannerIsBound;
@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			if(incomingCallScanner != null) {
 				Log.d(TAG, "onServiceConnected: " + incomingCallScanner.isServiceRunning());
 				startStopTB.setChecked(true);
-				filteredContactsAdapter = new ArrayAdapter<CharSequence>(getApplicationContext(),
+				filteredContactsAdapter = new ArrayAdapter<Contact>(getApplicationContext(),
 						android.R.layout.simple_list_item_1, BlackList.INSTANCE.getBlackListAsArrayList());
 				filteredContactsLV.setAdapter(filteredContactsAdapter);
 				filteredContactsAdapter.notifyDataSetChanged();
@@ -190,15 +190,14 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				// Your class variables now have the data, so do something with it
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
-					String phoneNumber = contact.getPhoneNumbers().get(0);
 					BlackList.INSTANCE.addContactToBlackList(contact);
 					
-					filteredContactsAdapter.add(name + " (" + phoneNumber + ")");
+					filteredContactsAdapter.add(contact);
 					filteredContactsAdapter.notifyDataSetChanged();
 					filteredContactsLV.refreshDrawableState();
 					Toast.makeText(this, name + " has been filtered", Toast.LENGTH_SHORT).show();
 				} else {
-					Toast.makeText(this, "Some data (Name or Phone Numer) is missing", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, "Some contact data (Name or Phone Numer) is missing", Toast.LENGTH_SHORT).show();
 				}
 			} else {
 				Toast.makeText(this, "No contact was selected", Toast.LENGTH_SHORT).show();
@@ -347,17 +346,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
 		Log.d(TAG, "onItemClick");
-		final String info = (String) filteredContactsLV.getItemAtPosition(position);
+		final Contact contact = (Contact) filteredContactsLV.getItemAtPosition(position);
 		AlertDialog.Builder adb=new AlertDialog.Builder(MainActivity.this);
 		adb.setTitle("Delete?");
-		adb.setMessage("Are you sure you want to delete " + info);
+		adb.setMessage("Are you sure you want to delete " + contact.getName());
 		adb.setNegativeButton("Cancel", null);
 		adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				String phone = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
-				Log.d(TAG, "onItemClick: removing " + phone);
-				BlackList.INSTANCE.removeContactFromBlackList(phone);
-				filteredContactsAdapter.remove(info);
+				BlackList.INSTANCE.removeContactFromBlackList(contact);
+				filteredContactsAdapter.remove(contact);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 			}});
@@ -370,7 +367,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		
 		Cursor cursor =  managedQuery(intent.getData(), null, null, null, null);     
 		startManagingCursor(cursor);
-		Log.d(TAG, "Elements " + cursor.getCount());
+		Log.d(TAG, "getContactInfo. Elements: " + cursor.getCount());
 
 		while (cursor.moveToNext()) {           
 			String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -392,7 +389,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					// When receiving a call the number includes spaces, brackets and hyphens.
 					phoneNumber = phoneNumber.replaceAll("[\\s\\-()]", "");
 					contactBuilder.addPhoneNumber(phoneNumber);
-					Log.i(TAG, "phoneNumber" + phoneNumber);
+					Log.d(TAG, "getContactInfo. Phone Number: " + phoneNumber);
 				}
 				phones.close();
 			}

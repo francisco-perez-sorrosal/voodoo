@@ -34,6 +34,8 @@ public class IncomingCallScanner extends Service {
 	private AudioManager am;
 	private int currentAudioMode;
 	
+	private Calendar calendar = Calendar.getInstance();
+	
 	private boolean serviceRunning = false;
 
 	public boolean isServiceRunning() {
@@ -78,15 +80,21 @@ public class IncomingCallScanner extends Service {
 							Log.e(TAG, "Unable to kill incoming call");
 						}
 						// Get relevant call info and notify observers
-						Calendar calendar = Calendar.getInstance();
 						Date dateTime = calendar.getTime();
-						String name = BlackList.INSTANCE.getContact(incomingNumber);
-						notifyCallObservers(new CallInfo(dateTime, name, incomingNumber, null));
+						String caller = getResources().getString(R.string.unknown_contact);
+						ArrayList<String> emailAdresses = new ArrayList<String>();
+						Contact contact = BlackList.INSTANCE.getContact(incomingNumber);
+						if (contact != null) {
+							caller = contact.getName();
+							emailAdresses = contact.getEmailAddresses();
+						}
+						// TODO: Refactor CallInfo to use the Builder pattern
+						notifyCallObservers(new CallInfo(getApplicationContext(), dateTime, caller, incomingNumber, emailAdresses));
 						// Inform user
 						CharSequence text = 
 								dateTime.toString() + " "
 								+ getResources().getString(R.string.call_message_1)
-								+ " " + name + " " 
+								+ " " + caller + " " 
 								+ getResources().getString(R.string.call_message_2);
 						UserNotification.showToastWithImage(context, text, R.drawable.app_icon);
 					} else {
@@ -116,6 +124,7 @@ public class IncomingCallScanner extends Service {
 
 		if(!serviceRunning) {
 			Log.d(TAG, "Loading map with blacklist...");
+			// Add the log helper as default observer
 			addCallObserver(LogHelper.getInstance(getApplicationContext()));
 			BlackList.INSTANCE.loadMapFromFile(getApplicationContext());
 			am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
