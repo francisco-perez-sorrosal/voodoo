@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mainLayout"
+	android:background="@color/background"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/linearLayout3" android:layout_marginTop="10dip">
+        <TextView android:layout_height="match_parent" android:id="@+id/textView2" android:layout_gravity="center|center_vertical" android:gravity="center_vertical" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/ics_service_enabled" android:textStyle="bold"></TextView>
+        <ToggleButton android:layout_height="match_parent" android:id="@+id/startStopTB" android:text="ToggleButton" android:textOff="@string/stopped" android:textOn="@string/started" android:layout_width="75dp" android:gravity="center_vertical|center_horizontal" android:layout_gravity="center_vertical|center_horizontal"></ToggleButton>
+        <CheckBox android:layout_height="match_parent" android:layout_width="match_parent" android:text="@string/filter_all_calls" android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/filterAllCB" android:textStyle="italic"></CheckBox>
+    </LinearLayout>
+    <View android:layout_height="2px" android:layout_marginTop="5dip" android:layout_marginBottom="5dip" android:layout_width="match_parent" android:background="#DDFFDD"></View>
+    <LinearLayout android:baselineAligned="false" android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_width="wrap_content">
+        <TextView android:layout_marginRight="10dip" android:layout_height="wrap_content" android:id="@+id/textView4" android:layout_gravity="center_vertical" android:layout_weight="1" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:text="@string/email_enabled" android:textStyle="italic"></TextView>
+        <ToggleButton android:layout_height="wrap_content" android:id="@+id/emailTB" android:layout_weight="1" android:text="ToggleButton" android:layout_width="wrap_content"></ToggleButton>
+        <TextView android:layout_marginRight="10dip" android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_gravity="center_vertical" android:layout_weight="1" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:text="@string/twitter_enabled" android:textStyle="italic"></TextView>
+        <ToggleButton android:layout_height="wrap_content" android:id="@+id/twitterTB" android:layout_weight="1" android:layout_width="wrap_content" android:text="ToggleButton"></ToggleButton>
+    </LinearLayout>
+    <View android:layout_height="2px" android:layout_marginTop="5dip" android:layout_marginBottom="5dip" android:layout_width="match_parent" android:background="#DDFFDD"></View>
+    <LinearLayout android:orientation="vertical" android:layout_height="match_parent" android:layout_width="match_parent" android:id="@+id/linearLayout2">
+        <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="match_parent" android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/filtered_contacts" android:textStyle="bold|italic"></TextView>
+        <HorizontalScrollView android:layout_height="fill_parent" android:layout_width="match_parent">
+            <ListView android:scrollbars="vertical" android:layout_height="match_parent" android:isScrollContainer="true" android:id="@+id/filteredContactsLV" android:scrollbarStyle="insideOverlay" android:layout_width="wrap_content"></ListView>
+        </HorizontalScrollView>
+    </LinearLayout>
+</LinearLayout>

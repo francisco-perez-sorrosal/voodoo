@@ -6,7 +6,7 @@
     <string name="unknown_contact">Unknown contact</string>
     
     <!-- Filtering service related strings -->
-    <string name="ics_service_enabled">Start/Stop Filtering Service</string>
+    <string name="ics_service_enabled">Filtering Service</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
     <string name="ics_service_started">Incoming Call Scanner started</string>    

@@ -90,5 +90,10 @@ public class CallInfo implements Serializable {
 	public List<String> getEmailAddresses() {
 		return emailAddresses;
 	}
+	
+	@Override
+	public String toString() {
+		return getCaller() + " " + getCallNumber();
+	}
 		
 }

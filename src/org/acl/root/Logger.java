@@ -12,6 +12,23 @@ import java.util.List;
 import android.content.Context;
 import android.util.Log;
 
+/**
+ * A singleton that manages the log of incoming calls that occur whilst the
+ * filtering service is active. It manages an in-memory list of CallInfo objects
+ * that is persisted to a file each time an incoming call is received.
+ * NOTE that this is an INEFFICIENT solution. I've tried to append serialized 
+ * CallInfo objects to the end of the log file but this is not easy to 
+ * implement through serialization in Java. This because when several read 
+ * operations are performed on the input stream, only the first one is able to
+ * found the header written by the output stream. The next read throws an
+ * IOException.
+ * 
+ * TODO Improve this serializing the required call information as strings
+ * or using a database to store the CallInfo objects
+ * 
+ * @author Francisco PŽrez-Sorrosal (fperez)
+ *
+ */
 public enum Logger implements CallObserver {
 
 	INSTANCE;
@@ -19,37 +36,33 @@ public enum Logger implements CallObserver {
 	private static final String TAG = "Logger";
 	
 	public static final String LOGFILE = "log.txt";
-
-	private List<CallInfo> callLog;
+	
+	private List<CallInfo> callLog = new ArrayList<CallInfo>();
+	private boolean callLogCached = false;
+	
 
 	public List<CallInfo> getCallLog(Context context) {
-		initCallLog(context);
+		if(!callLogCached) loadLogFromFile(context);
 		return callLog;
 	}
 	
 	public void clearLog(Context context) {
-		if(callLog != null) callLog.clear();
+		callLog.clear();
 		context.deleteFile(LOGFILE);
 	}
 
 	@Override
 	public void callNotification(CallInfo callInfo) {
-		initCallLog(callInfo.getContext());
+		Context context = callInfo.getContext();
+		if(!callLogCached) loadLogFromFile(context);
 		Log.d(TAG, "Adding call to log file...");
-		callLog.add(callInfo);
-		saveToLogFile(callInfo);
-		Log.d(TAG, "Call added to log file.");
+		callLog.add(0, callInfo);
+		saveLogToLogFile(context);
 	}
 		
 	// ------------------------- Private methods ------------------------------
 	
-	private void initCallLog(Context context) {
-		if(callLog == null) {
-			 callLog = new ArrayList<CallInfo>();
-			 loadLogFromFile(context);
-		}
-	}
-	
+	@SuppressWarnings("unchecked")
 	private void loadLogFromFile(Context context) {
 		FileInputStream fis = null;
 		ObjectInputStream ois = null;
@@ -57,15 +70,14 @@ public enum Logger implements CallObserver {
 		try {
 			fis = context.openFileInput(LOGFILE);
 			ois = new ObjectInputStream(fis);
-			CallInfo callInfo;
-			// This throws an IOException when EOF is found
-			while((callInfo = (CallInfo) ois.readObject()) != null)
-				callLog.add(callInfo);
-			Log.i(TAG, "Log read");
+			callLog = (ArrayList<CallInfo>) ois.readObject();
+			callLogCached = true;
+			Log.i(TAG, "Log read from file");
 		} catch (FileNotFoundException e) { 
-			Log.i(TAG, "File Still not created");
+			Log.e(TAG, "File Still not created");
+			callLogCached = true;
 		} catch (IOException e) {
-			Log.e(TAG, "IOException. No more call info objects??? Probably...	");
+			Log.e(TAG, "IOException", e);
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG, "ClassNotFoundException", e);
 		} finally {
@@ -78,16 +90,15 @@ public enum Logger implements CallObserver {
 		}
 	}
 	
-	public void saveToLogFile(CallInfo callInfo) {
+	public void saveLogToLogFile(Context context) {
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 
 		try {
-			fos = callInfo.getContext().openFileOutput(LOGFILE,
-					Context.MODE_PRIVATE | Context.MODE_APPEND);
+			fos = context.openFileOutput(LOGFILE, Context.MODE_PRIVATE );
 			oos =  new ObjectOutputStream(fos);
-			oos.writeObject(callInfo);
-			Log.i(TAG, "Entry saved in Log");
+			oos.writeObject(callLog);
+			Log.i(TAG, "Log saved in file");
 		} catch (FileNotFoundException e) {
 			Log.d(TAG, "FileNotFoundException", e);
 		} catch (IOException e) {
@@ -100,7 +111,6 @@ public enum Logger implements CallObserver {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 }
