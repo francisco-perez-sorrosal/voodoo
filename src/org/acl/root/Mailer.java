@@ -1,7 +1,7 @@
 package org.acl.root;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.activation.CommandMap;
@@ -26,9 +26,9 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-public class MailHelper extends Authenticator implements CallObserver {
+public class Mailer extends Authenticator implements CallObserver {
 
-	private static final String TAG = "MailHelper";
+	private static final String TAG = "Mailer";
 	private static final String DEFAULT_FROM_EMAIL = "no-reply@linkingenius.com";
 	private static final String DEFAULT_SUBJECT = "Autoresponse from Blacklist Android App";
 
@@ -37,11 +37,11 @@ public class MailHelper extends Authenticator implements CallObserver {
 	protected static final String EMAIL = "email_user";
 	protected static final String EMAIL_PASSWORD = "email_password";
 	
-	public static  MailHelper instance;
+	public static  Mailer instance;
 	
-	public static MailHelper getInstance(Context context) {
+	public static Mailer getInstance() {
 		if(instance == null)
-			instance = new MailHelper(context);
+			instance = new Mailer();
 		return instance;
 	}
 	
@@ -62,20 +62,14 @@ public class MailHelper extends Authenticator implements CallObserver {
 	private boolean debuggable;
 
 	/**
-	 * First version of MailHelper.
+	 * First version of Mailer.
 	 * 
 	 * Check this for more info:
 	 * http://www.jondev.net/articles/Sending_Emails_without_User_Intervention_
 	 * %28no_Intents%29_in_Android
 	 */
-	private MailHelper(Context context) {
-		
+	private Mailer() {
 		Log.d(TAG, "Constructor");
-		SharedPreferences emailPreferences = 
-				context.getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
-		
-		user = emailPreferences.getString(EMAIL, "" );
-		password = emailPreferences.getString(EMAIL_PASSWORD, "" );
 		
 		host = "smtp.gmail.com"; // default smtp server
 		port = "465"; // default smtp port
@@ -101,7 +95,14 @@ public class MailHelper extends Authenticator implements CallObserver {
 		CommandMap.setDefaultCommandMap(mc);
 	}
 
-	public boolean send() throws Exception {
+	public boolean send(Context context) throws Exception {
+
+		SharedPreferences emailPreferences = 
+				context.getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
+		
+		user = emailPreferences.getString(EMAIL, "" );
+		password = emailPreferences.getString(EMAIL_PASSWORD, "" );
+		
 		Properties props = setMailProperties();
 		
 		if (!user.equals("") && !password.equals("") && to.length > 0
@@ -197,7 +198,7 @@ public class MailHelper extends Authenticator implements CallObserver {
 	 */
 	@Override
 	public void callNotification(CallInfo callInfo) {
-		ArrayList<String> emailAddresses = callInfo.getEmailAddresses();
+		List<String> emailAddresses = callInfo.getEmailAddresses();
 		if(emailAddresses.size() > 0) {
 			Log.d(TAG, "Sending email to " + emailAddresses.toString());
 			String[] toArr = new String[emailAddresses.size()];
@@ -207,7 +208,7 @@ public class MailHelper extends Authenticator implements CallObserver {
 			setSubject(DEFAULT_SUBJECT);
 			setBody("Francisco is busy at this time. Please call him late.");
 			try {
-				if (send()) {
+				if (send(callInfo.getContext())) {
 					Log.d(TAG, "Email sent.");
 				} else {
 					Log.d(TAG, "Email was not sent.");

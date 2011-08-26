@@ -15,7 +15,7 @@ import java.util.ArrayList;
  */
 public class Contact implements Serializable {
 	
-	private static final long serialVersionUID = 83472973490823798L ;
+	private static final long serialVersionUID = 83472973490823798L;
 	
 	private String id;
 	private String name;

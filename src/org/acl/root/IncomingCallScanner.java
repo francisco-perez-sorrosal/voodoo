@@ -6,6 +6,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,8 +36,6 @@ public class IncomingCallScanner extends Service {
 	
 	private AudioManager am;
 	private int currentAudioMode;
-	
-	private Calendar calendar = Calendar.getInstance();
 	
 	private boolean serviceRunning = false;
 
@@ -80,23 +81,13 @@ public class IncomingCallScanner extends Service {
 							Log.e(TAG, "Unable to kill incoming call");
 						}
 						// Get relevant call info and notify observers
-						Date dateTime = calendar.getTime();
-						String caller = getResources().getString(R.string.unknown_contact);
-						ArrayList<String> emailAdresses = new ArrayList<String>();
+						CallInfo.Builder callInfoBuilder = new CallInfo.Builder(getApplicationContext(), incomingNumber);
 						Contact contact = BlackList.INSTANCE.getContact(incomingNumber);
 						if (contact != null) {
-							caller = contact.getName();
-							emailAdresses = contact.getEmailAddresses();
+							callInfoBuilder.caller(contact.getName()).
+							emailAddresses(contact.getEmailAddresses());
 						}
-						// TODO: Refactor CallInfo to use the Builder pattern
-						notifyCallObservers(new CallInfo(getApplicationContext(), dateTime, caller, incomingNumber, emailAdresses));
-						// Inform user
-						CharSequence text = 
-								dateTime.toString() + " "
-								+ getResources().getString(R.string.call_message_1)
-								+ " " + caller + " " 
-								+ getResources().getString(R.string.call_message_2);
-						UserNotification.showToastWithImage(context, text, R.drawable.app_icon);
+						notifyCallObservers(callInfoBuilder.build());
 					} else {
 						am.setRingerMode(currentAudioMode);
 					}
@@ -123,9 +114,9 @@ public class IncomingCallScanner extends Service {
 	public void onCreate() {
 
 		if(!serviceRunning) {
-			Log.d(TAG, "Loading map with blacklist...");
-			// Add the log helper as default observer
-			addCallObserver(LogHelper.getInstance(getApplicationContext()));
+			// Add the log and UserNotifier as default observers
+			addCallObserver(Logger.INSTANCE);
+			addCallObserver(UserNotifier.INSTANCE);
 			BlackList.INSTANCE.loadMapFromFile(getApplicationContext());
 			am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 			currentAudioMode = am.getRingerMode();
@@ -134,7 +125,7 @@ public class IncomingCallScanner extends Service {
 			filter.addAction("android.intent.action.PHONE_STATE");
 			filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
 			registerReceiver(phoneStateReceiver, filter);
-			serviceRunning = true;			
+			serviceRunning = true;
 			Log.d(TAG, "Created");
 		}
 	}
@@ -142,7 +133,7 @@ public class IncomingCallScanner extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "Received start id " + startId + ": " + intent);
-		UserNotification.showNotification(getApplicationContext());
+		showNotification();
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
@@ -157,8 +148,9 @@ public class IncomingCallScanner extends Service {
 			am.setRingerMode(currentAudioMode);
 			am = null;
 			unregisterReceiver(phoneStateReceiver);
-			removeCallObserver(TwitterHelper.getInstance(getApplicationContext()));
-			UserNotification.cancelNotification(getApplicationContext(), UserNotification.SVC_STARTED_NOTIFICATION);
+			removeCallObserver(Logger.INSTANCE);
+			removeCallObserver(UserNotifier.INSTANCE);
+			cancelNotification(SVC_STARTED_NOTIFICATION);
 			serviceRunning = false;
 			Log.d(TAG, "Stopped");
 			// Tell the user we stopped.
@@ -166,9 +158,45 @@ public class IncomingCallScanner extends Service {
 		}
 	}
 
-	// ------------------------- Lifecycle -------------------------
+	// ------------------------ End Lifecycle ---------------------------------
 
-	public boolean killCall(Context context) {
+	// ------------------------ Notifications ---------------------------------
+	
+	public static final int SVC_STARTED_NOTIFICATION = 0;
+	
+	public void showNotification() {
+		NotificationManager mNotificationManager = 
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		int icon = R.drawable.skullnbones;
+		CharSequence tickerText = "Starting Incoming Call Scanner";
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags |= Notification.DEFAULT_VIBRATE | 
+				Notification.FLAG_NO_CLEAR;
+		long[] vibrate = {0,100,200,300};
+		notification.vibrate = vibrate;
+
+		CharSequence contentTitle = "Incoming Call Scanner";
+		CharSequence contentText = "The service is filtering inconming calls from jerks!";
+		Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
+		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
+
+		notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
+
+		mNotificationManager.notify(SVC_STARTED_NOTIFICATION, notification);
+	}
+
+	public void cancelNotification(int notification) {
+		NotificationManager mNotificationManager = 
+				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(notification);
+	}
+
+	// ------------------------- End Notifications ----------------------------
+	
+	private boolean killCall(Context context) {
 		try {
 			// Get the boring old TelephonyManager
 			TelephonyManager telephonyManager = (TelephonyManager) context
@@ -216,6 +244,10 @@ public class IncomingCallScanner extends Service {
 	 */
 	private List<CallObserver> callObservers =
 			new ArrayList<CallObserver>();
+	
+	public int nofObservers() {
+		return callObservers.size();
+	}
 	
 	public void addCallObserver(CallObserver observer) {
 		callObservers.add(observer);

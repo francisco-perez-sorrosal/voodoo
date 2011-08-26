@@ -36,8 +36,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 /**
- * Main activity for the application. Contains the start/stop button for
- * activating the Incoming Calls Scanner, and the menu to select the 
+ * Main activity for my blacklist application. Contains the start/stop button 
+ * for activating the scanner of incoming calls, and the menu to select the 
  * contacts to filter.
  * 
  * @author Francisco PŽrez-Sorrosal (fperez)
@@ -64,6 +64,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
+			Log.d(TAG, "Observers " + incomingCallScanner.nofObservers());
 			if(incomingCallScanner != null) {
 				Log.d(TAG, "onServiceConnected: " + incomingCallScanner.isServiceRunning());
 				startStopTB.setChecked(true);
@@ -75,11 +76,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				incomingCallScannerIsBound = true;
 				if(incomingCallScanner.isAllCallsFilterEnabled())
 					filterAllCB.setChecked(true);
-				if(incomingCallScanner.containsObserver(
-						MailHelper.getInstance(getApplicationContext())))
+				if(incomingCallScanner.containsObserver(Mailer.getInstance()))
 					emailTB.setChecked(true);
-				if(incomingCallScanner.containsObserver(
-						TwitterHelper.getInstance(getApplicationContext())))
+				if(incomingCallScanner.containsObserver(Twitterer.INSTANCE))
 					twitterTB.setChecked(true);
 			} else {
 				Log.d(TAG, "onServiceConnected: IncomingCallScanner is null");
@@ -190,12 +189,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				// Your class variables now have the data, so do something with it
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
-					BlackList.INSTANCE.addContactToBlackList(contact);
-					
-					filteredContactsAdapter.add(contact);
-					filteredContactsAdapter.notifyDataSetChanged();
-					filteredContactsLV.refreshDrawableState();
-					Toast.makeText(this, name + " has been filtered", Toast.LENGTH_SHORT).show();
+					Contact previousContact = BlackList.INSTANCE.addContactToBlackList(contact);
+					if(previousContact == null) { // To avoid duplicates
+						filteredContactsAdapter.add(contact);
+						filteredContactsAdapter.notifyDataSetChanged();
+						filteredContactsLV.refreshDrawableState();
+						Toast.makeText(this, name + " has been filtered", Toast.LENGTH_SHORT).show();
+					} else {
+						Toast.makeText(this, "Contact already filtered", Toast.LENGTH_SHORT).show();
+					}
 				} else {
 					Toast.makeText(this, "Some contact data (Name or Phone Numer) is missing", Toast.LENGTH_SHORT).show();
 				}
@@ -287,9 +289,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					
 					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
 							&& isTwitterOAuthAccessTokenValid(twitterOAuthAccessToken)) {
-						
+						Log.d(TAG, "THIS MUST NOT BE HERE");
 						// Both values were stored properly, so...
-						incomingCallScanner.addCallObserver(TwitterHelper.getInstance(getApplicationContext()));
+						incomingCallScanner.addCallObserver(Twitterer.INSTANCE);
 						
 					} else {
 						
@@ -312,7 +314,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						clearEmailConnectionFromService();
 						return;
 					}
-					incomingCallScanner.addCallObserver(MailHelper.getInstance(getApplicationContext()));
+					incomingCallScanner.addCallObserver(Mailer.getInstance());
 				} else {
 					emailTB.setChecked(false);
 				}
@@ -465,9 +467,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	}
 		
 	private void clearTwitterConnectionFromService() {
-			if(incomingCallScannerIsBound) {
-				incomingCallScanner.removeCallObserver(TwitterHelper.getInstance(this));
-			}
+			if(incomingCallScannerIsBound)
+				incomingCallScanner.removeCallObserver(Twitterer.INSTANCE);
+			
 			twitterOAuthConsumerData = null;
 			twitterOAuthRequestToken = null;
 			twitterOAuthAccessToken =  null;
@@ -555,7 +557,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	private void clearEmailConnectionFromService() {
 		if(incomingCallScannerIsBound) {
-			incomingCallScanner.removeCallObserver(MailHelper.getInstance(this));
+			incomingCallScanner.removeCallObserver(Mailer.getInstance());
 		}
 		emailTB.setChecked(false);
 	}

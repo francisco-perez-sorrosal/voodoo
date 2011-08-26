@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,7 +31,8 @@ public enum BlackList {
 					new ConcurrentHashMap<String, Contact>());
 	
 	public ArrayList<Contact> getBlackListAsArrayList() {
-		return  new ArrayList<Contact>(blackList.values());
+		Set<Contact> duplicateContactFilter = new HashSet<Contact>(blackList.values());
+		return  new ArrayList<Contact>(duplicateContactFilter);
 	}
 
 	public Contact addContactToBlackList(Contact contact) {
@@ -38,7 +41,8 @@ public enum BlackList {
 		
 		for(String phone : contact.getPhoneNumbers()) {
 			previousValue = blackList.putIfAbsent(phone, contact);
-			Log.d(TAG, name + " " + phone + " added to Black List");
+			if(previousValue == null)
+				Log.d(TAG, name + " " + phone + " added to Black List");
 		}
 		return previousValue;
 	}
@@ -70,17 +74,17 @@ public enum BlackList {
 			fis = context.openFileInput(FILE);
 			ois = new ObjectInputStream(fis);
 			
-			Contact contact;
-			
-			int size = ois.readInt(); //restore how many contacts  
-			for(int i=0; i < size; i++)  {
-			   contact = (Contact) ois.readObject();
+			List<Contact> storedBlackList = (ArrayList<Contact>) ois.readObject();
+			for(Contact contact : storedBlackList) {
 			   Log.d(TAG, "Reading " + contact);
-			   blackList.putIfAbsent(contact.getPhoneNumbers().get(0), contact);
+			   for(String phone : contact.getPhoneNumbers()) {
+				   blackList.putIfAbsent(phone, contact);
+				   Log.d(TAG, "Phone filtered: " + phone);
+			   }
 			}
 			Log.i(TAG, "Blacklist read");
 		} catch (FileNotFoundException e) { 
-			Log.e(TAG, "File Still not created", e);
+			Log.e(TAG, "File Still not created. No contacts maybe?");
 		} catch (IOException e) {
 			Log.e(TAG, "IOException", e);
 		} catch (ClassNotFoundException e) {
@@ -102,13 +106,10 @@ public enum BlackList {
 		try {
 			fos = context.openFileOutput(FILE, Context.MODE_PRIVATE);
 			oos =  new ObjectOutputStream(fos);
-
-			oos.writeInt(blackList.entrySet().size());
-			for (Map.Entry<String, Contact> entry : blackList.entrySet()) {
-				Log.d(TAG, "Writting " + entry.getValue());
-				oos.writeObject(entry.getValue());
-			}
-			Log.i(TAG, "Blacklist saved");
+			
+			List<Contact> blackListToStore = getBlackListAsArrayList();
+			oos.writeObject(blackListToStore);
+			Log.i(TAG, "Blacklist saved. # of contacts: " + blackListToStore.size());
 		} catch (FileNotFoundException e) {
 			Log.d(TAG, "FileNotFoundException", e);
 		} catch (IOException e) {

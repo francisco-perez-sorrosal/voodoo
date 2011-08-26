@@ -5,10 +5,26 @@
 	<TextView android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge"
 		android:id="@+id/textLog" android:text="@string/log_label" android:textStyle="bold"></TextView>
-	<LinearLayout android:layout_width="match_parent"
-		android:layout_height="wrap_content" android:orientation="vertical"
-		android:id="@+id/showLogLayout"></LinearLayout>
+		
 	<Button android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:id="@+id/btnBack"
-		android:text="@string/clear_log"></Button>
+			android:layout_height="wrap_content" android:id="@+id/btnBack"
+			android:text="@string/clear_log"></Button>
+			
+	<ScrollView
+        android:layout_width="fill_parent" 
+        android:layout_height="fill_parent"      
+        android:isScrollContainer="true" 
+        android:scrollbarAlwaysDrawVerticalTrack="true" 
+        android:scrollbarStyle="outsideInset" 
+        android:scrollbars="vertical">
+		
+		<!--HorizontalScrollView
+			android:layout_width="match_parent" android:layout_height="fill_parent"-->
+			<TableLayout android:layout_width="match_parent"
+				android:layout_height="wrap_content" android:orientation="vertical"
+				android:id="@+id/showLogLayout">			
+			</TableLayout>
+		<!--  /HorizontalScrollView-->
+			
+	</ScrollView>
 </LinearLayout>

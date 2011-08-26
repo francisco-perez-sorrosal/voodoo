@@ -1,8 +1,5 @@
 package org.acl.root;
 
-import java.util.Calendar;
-import java.util.Date;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +8,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 /**
  * Activity to capture the Twitter OAuth Consumer Data.
@@ -60,7 +56,7 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 			twitterPreferences.edit()
 				.putString(MainActivity.TWITTER_MESSAGE, message)
 				.commit();
-			TwitterHelper.getInstance(getApplicationContext()).setTweet(message);
+			Twitterer.INSTANCE.setDefaultTweet(message);
 			finish();
 		} else
 			
