@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onServiceConnected: " + incomingCallScanner.isServiceRunning());
 				startStopTB.setChecked(true);
 				filteredContactsAdapter = new ArrayAdapter<Contact>(getApplicationContext(),
-						android.R.layout.simple_list_item_1, BlackList.INSTANCE.getBlackListAsArrayList());
+						R.layout.contact_list_item, BlackList.INSTANCE.getBlackListAsArrayList());
 				filteredContactsLV.setAdapter(filteredContactsAdapter);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
