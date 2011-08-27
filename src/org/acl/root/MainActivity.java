@@ -170,6 +170,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			launchTwitterConfigurationActivity();
 			break;
 		case R.id.logs:
+			if(incomingCallScannerIsBound) {
+				incomingCallScanner.showNotification(incomingCallScanner.buildShowLogNotification());
+			}
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);
 			break;

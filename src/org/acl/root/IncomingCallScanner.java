@@ -88,6 +88,7 @@ public class IncomingCallScanner extends Service {
 							emailAddresses(contact.getEmailAddresses());
 						}
 						notifyCallObservers(callInfoBuilder.build());
+						showNotification(buildIncomingCallNotification());
 					} else {
 						am.setRingerMode(currentAudioMode);
 					}
@@ -133,7 +134,7 @@ public class IncomingCallScanner extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "Received start id " + startId + ": " + intent);
-		showNotification();
+		showNotification(buildInitialNotification());
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
@@ -164,19 +165,9 @@ public class IncomingCallScanner extends Service {
 	
 	public static final int SVC_STARTED_NOTIFICATION = 0;
 	
-	public void showNotification() {
+	public void showNotification(Notification notification) {
 		NotificationManager mNotificationManager = 
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-		int icon = R.drawable.skullnbones;
-		CharSequence tickerText = "Starting Incoming Call Scanner";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags |= Notification.DEFAULT_VIBRATE | 
-				Notification.FLAG_NO_CLEAR;
-		long[] vibrate = {0,100,200,300};
-		notification.vibrate = vibrate;
 
 		CharSequence contentTitle = "Incoming Call Scanner";
 		CharSequence contentText = "The service is filtering inconming calls from jerks!";
@@ -193,7 +184,39 @@ public class IncomingCallScanner extends Service {
 				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel(notification);
 	}
+	
+	public Notification buildInitialNotification() {
+		int icon = R.drawable.skullnbones;
+		CharSequence tickerText = "Starting Incoming Call Scanner";
+		long when = System.currentTimeMillis();
 
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags |= Notification.DEFAULT_VIBRATE | 
+				Notification.FLAG_NO_CLEAR;
+		long[] vibrate = {0,100,200,300};
+		notification.vibrate = vibrate;
+		return notification;
+	}
+	
+	public Notification buildIncomingCallNotification() {
+		int icon = R.drawable.redskullnbones;
+		CharSequence tickerText = "Incoming Call Received";
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags |= Notification.FLAG_NO_CLEAR;
+		return notification;
+	}
+
+	public Notification buildShowLogNotification() {
+		int icon = R.drawable.skullnbones;
+		CharSequence tickerText = "Showing log...";
+		long when = System.currentTimeMillis();
+
+		Notification notification = new Notification(icon, tickerText, when);
+		notification.flags |= Notification.FLAG_NO_CLEAR;
+		return notification;
+	}
 	// ------------------------- End Notifications ----------------------------
 	
 	private boolean killCall(Context context) {
