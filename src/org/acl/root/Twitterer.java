@@ -19,7 +19,8 @@ public enum Twitterer implements CallObserver {
 	private static final String TAG = "Twitterer";
 	
 	private static final String TWITTER_PREFS = "twitter_preferences";
-	private static final int MAX_TWEET_LENGTH = 140;
+	// Max length is 120 (and not 140) because the date/time is also inserted
+	private static final int MAX_TWEET_LENGTH = 120;
 	
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
