@@ -25,33 +25,10 @@ public enum Twitterer implements CallObserver {
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
 	
-	//private static Twitterer instance;
-	
 	private String defaultTweet = "Sorry, the person you are trying to communicate with is busy";
 	
 	private Twitter twitter = null;
-	
-//	public static Twitterer getInstance(Context context) {
-//		if(instance == null)
-//			instance = new Twitterer(context);
-//		return instance;
-//	}
-//	
-//	private Twitterer(Context context) {
-//		
-//		SharedPreferences twitterPreferences = 
-//				context.getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
-//		
-//		Configuration conf = new ConfigurationBuilder()
-//	    .setOAuthConsumerKey(CONSUMER_KEY)
-//	    .setOAuthConsumerSecret(CONSUMER_SECRET)
-//	    .setOAuthAccessToken(twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" ))
-//	    .setOAuthAccessTokenSecret(twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ))
-//	    .build();
-//	 
-//		twitter = new TwitterFactory(conf).getInstance();
-//	}
-		
+			
 	public boolean setDefaultTweet(String text) {
 		
 		if (text.length() > MAX_TWEET_LENGTH) {
@@ -66,7 +43,7 @@ public enum Twitterer implements CallObserver {
 	@Override
 	public void callNotification(CallInfo callInfo) {
 		if(twitter == null) {
-			getTwitterInstance(callInfo.getContext());
+			twitter = obtainTwitterInstance(callInfo.getContext());
 		}
 		
 		try {
@@ -78,7 +55,7 @@ public enum Twitterer implements CallObserver {
 		}	
 	}
 
-	private void getTwitterInstance(Context context) {
+	private Twitter obtainTwitterInstance(Context context) {
 		SharedPreferences twitterPreferences = 
 				context.getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
 		
@@ -89,7 +66,7 @@ public enum Twitterer implements CallObserver {
 		.setOAuthAccessTokenSecret(twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ))
 		.build();
  
-		twitter = new TwitterFactory(conf).getInstance();
+		return new TwitterFactory(conf).getInstance();
 	}
 
 }
