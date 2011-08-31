@@ -29,5 +29,8 @@
 		<activity android:name=".EmailUserDataActivity" />
 		<activity android:name=".TwitterConfigurationActivity" />
 		<activity android:name=".TwitterWebviewActivity" />
+		<!-- Google Ads Activity-->
+		<activity android:name="com.google.ads.AdActivity"
+              android:configChanges="keyboard|keyboardHidden|orientation"/>
 	</application>
 </manifest>

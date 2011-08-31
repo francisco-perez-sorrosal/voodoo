@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
   android:background="@color/background"
   android:orientation="vertical"
   android:layout_width="match_parent" android:weightSum="1" android:layout_height="match_parent">
     <TextView android:textAppearance="?android:attr/textAppearanceLarge" android:layout_height="wrap_content" android:id="@+id/textView3" android:text="@string/email_name" android:layout_width="match_parent" android:textStyle="bold" android:layout_gravity="center_vertical" android:gravity="center"></TextView>
-    <View android:layout_height="2px" android:layout_marginTop="5dip" android:layout_marginBottom="5dip" android:background="#DDFFDD" android:layout_width="match_parent"></View>
-    <TextView android:id="@+id/textView1" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="match_parent" android:text="User email" android:textStyle="italic"></TextView>
-    <EditText android:id="@+id/emailT" android:layout_height="wrap_content" android:layout_width="match_parent">
+    <com.google.ads.AdView ads:adUnitId="MY_AD_UNIT_ID" ads:adSize="IAB_BANNER" ads:loadAdOnCreate="true" android:layout_height="wrap_content" android:id="@+id/adView" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></com.google.ads.AdView>
+    <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="match_parent" android:textAppearance="?android:attr/textAppearanceMedium" android:text="User email" android:layout_below="@+id/view1" android:layout_alignParentLeft="true"></TextView>
+    <View android:layout_height="2px" android:layout_width="match_parent" android:id="@+id/view1" android:background="#DDFFDD" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true"></View>
+    <EditText android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/emailT" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true"></EditText>
+    <TextView android:layout_height="wrap_content" android:id="@+id/textView2" android:layout_width="match_parent" android:textAppearance="?android:attr/textAppearanceMedium" android:text="Password" android:layout_below="@+id/emailT" android:layout_alignParentLeft="true"></TextView>
+    <EditText android:layout_height="wrap_content" android:inputType="textPassword" android:layout_width="match_parent" android:id="@+id/emailPasswordT" android:layout_below="@+id/textView2" android:layout_alignParentLeft="true">
         <requestFocus></requestFocus>
     </EditText>
-    <TextView android:id="@+id/textView2" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Password" android:textStyle="italic"></TextView>
-    <EditText android:inputType="textPassword" android:id="@+id/emailPasswordT" android:layout_height="wrap_content" android:layout_width="match_parent"></EditText>
-    <View android:layout_height="2px" android:layout_marginTop="5dip" android:layout_marginBottom="5dip" android:background="#DDFFDD" android:layout_width="match_parent"></View>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1">
-        <Button android:id="@+id/emailDoneB" android:layout_width="wrap_content" android:text="Done" android:layout_height="wrap_content"></Button>
-        <Button android:id="@+id/emailClearB" android:layout_width="wrap_content" android:text="Clear" android:layout_height="wrap_content"></Button>
+    <View android:layout_height="2px" android:layout_width="match_parent" android:background="#DDFFDD" android:layout_below="@+id/emailPasswordT" android:layout_alignParentLeft="true" android:layout_marginTop="14dp" android:id="@+id/view2"></View>
+    <LinearLayout android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/LinearLayout1" android:layout_below="@+id/view2" android:layout_alignParentLeft="true" android:layout_marginTop="20dp">
+        <Button android:layout_height="wrap_content" android:id="@+id/emailDoneB" android:layout_width="wrap_content" android:text="Done"></Button>
+        <Button android:layout_height="wrap_content" android:id="@+id/emailClearB" android:layout_width="wrap_content" android:text="Clear"></Button>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

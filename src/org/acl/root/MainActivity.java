@@ -35,6 +35,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
+
 /**
  * Main activity for my blacklist application. Contains the start/stop button 
  * for activating the scanner of incoming calls, and the menu to select the 
@@ -97,8 +100,11 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.main);
+		
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+	    adView.loadAd(new AdRequest());
 		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
@@ -171,7 +177,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			break;
 		case R.id.logs:
 			if(incomingCallScannerIsBound) {
-				incomingCallScanner.showNotification(incomingCallScanner.buildShowLogNotification());
+				UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
+						UserNotifier.CallScannerNotification.SHOW_LOG);
 			}
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);

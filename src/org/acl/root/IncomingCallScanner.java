@@ -2,13 +2,8 @@ package org.acl.root;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -88,7 +83,8 @@ public class IncomingCallScanner extends Service {
 							emailAddresses(contact.getEmailAddresses());
 						}
 						notifyCallObservers(callInfoBuilder.build());
-						showNotification(buildIncomingCallNotification());
+						UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
+								UserNotifier.CallScannerNotification.INCOMING_CALL);
 					} else {
 						am.setRingerMode(currentAudioMode);
 					}
@@ -134,12 +130,12 @@ public class IncomingCallScanner extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "Received start id " + startId + ": " + intent);
-		showNotification(buildInitialNotification());
+		UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
+				UserNotifier.CallScannerNotification.INIT);
 		// We want this service to continue running until it is explicitly
 		// stopped, so return sticky.
 		return START_STICKY;
 	}
-
 
 	@Override
 	public void onDestroy() {
@@ -151,7 +147,7 @@ public class IncomingCallScanner extends Service {
 			unregisterReceiver(phoneStateReceiver);
 			removeCallObserver(Logger.INSTANCE);
 			removeCallObserver(UserNotifier.INSTANCE);
-			cancelNotification(SVC_STARTED_NOTIFICATION);
+			UserNotifier.INSTANCE.cancelCallScannerNotification(getApplicationContext());
 			serviceRunning = false;
 			Log.d(TAG, "Stopped");
 			// Tell the user we stopped.
@@ -160,64 +156,6 @@ public class IncomingCallScanner extends Service {
 	}
 
 	// ------------------------ End Lifecycle ---------------------------------
-
-	// ------------------------ Notifications ---------------------------------
-	
-	public static final int SVC_STARTED_NOTIFICATION = 0;
-	
-	public void showNotification(Notification notification) {
-		NotificationManager mNotificationManager = 
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-		CharSequence contentTitle = "Incoming Call Scanner";
-		CharSequence contentText = "The service is filtering inconming calls from jerks!";
-		Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
-
-		notification.setLatestEventInfo(getApplicationContext(), contentTitle, contentText, contentIntent);
-
-		mNotificationManager.notify(SVC_STARTED_NOTIFICATION, notification);
-	}
-
-	public void cancelNotification(int notification) {
-		NotificationManager mNotificationManager = 
-				(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(notification);
-	}
-	
-	public Notification buildInitialNotification() {
-		int icon = R.drawable.skullnbones;
-		CharSequence tickerText = "Starting Incoming Call Scanner";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags |= Notification.DEFAULT_VIBRATE | 
-				Notification.FLAG_NO_CLEAR;
-		long[] vibrate = {0,100,200,300};
-		notification.vibrate = vibrate;
-		return notification;
-	}
-	
-	public Notification buildIncomingCallNotification() {
-		int icon = R.drawable.redskullnbones;
-		CharSequence tickerText = "Incoming Call Received";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags |= Notification.FLAG_NO_CLEAR;
-		return notification;
-	}
-
-	public Notification buildShowLogNotification() {
-		int icon = R.drawable.skullnbones;
-		CharSequence tickerText = "Showing log...";
-		long when = System.currentTimeMillis();
-
-		Notification notification = new Notification(icon, tickerText, when);
-		notification.flags |= Notification.FLAG_NO_CLEAR;
-		return notification;
-	}
-	// ------------------------- End Notifications ----------------------------
 	
 	private boolean killCall(Context context) {
 		try {

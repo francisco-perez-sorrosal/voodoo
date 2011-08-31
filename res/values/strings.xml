@@ -4,11 +4,19 @@
     
     <!-- General messages -->
     <string name="unknown_contact">Unknown contact</string>
+    <string name="delete_op">Delete operation</string>
+    <string name="ok_tag">Yes</string>
+    <string name="cancel_tag">No</string>
     
     <!-- Filtering service related strings -->
+    <string name="service_name">Incoming Call Scanner</string>
+    <string name="service_name_description">This service is filtering undesired incoming calls!</string>
     <string name="ics_service_enabled">Filtering Service</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
+    <string name="starting_ics_service">Starting Incoming Call Scanner</string>
+    <string name="incoming_call_received">Incoming Call Received</string>
+    <string name="show_log">Showing log...</string>
     <string name="ics_service_started">Incoming Call Scanner started</string>    
     <string name="ics_service_stopped">Incoming Call Scanner has been stopped</string>
     <string name="filtered_contacts">Filtered Contacts</string>
@@ -35,4 +43,10 @@
 	<string name="call_log">Call Log</string>
     <string name="log_label">Received Calls</string>
     <string name="clear_log">Clear Log</string>
+    <string name="caller_log_tag">Caller: </string>
+    <string name="phone_log_tag">Phone: </string>
+    <string name="date_log_tag">Date: </string>
+    <string name="hour_log_tag">Hour: </string>
+    <string name="confirm_clear_log_msg">Are you sure you want to remove log info?</string>
+    <string name="log_empty_msg">No received calls in log</string>
 </resources>
