@@ -121,8 +121,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		filteredContactsLV = (ListView) findViewById(R.id.filteredContactsLV);
 		filteredContactsLV.setOnItemClickListener(this);
 
+		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
-				IncomingCallScanner.class), mConnection, Context.BIND_NOT_FOREGROUND);
+				IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
 		
 		emailPreferences = getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
 		twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
@@ -256,8 +257,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Log.d(TAG, "onClick: starting service");
 				Intent intent = new Intent(this, IncomingCallScanner.class);
 				startService(intent);
+				// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 				bindService(new Intent(this, 
-						IncomingCallScanner.class), mConnection, Context.BIND_NOT_FOREGROUND);
+						IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
 				Log.d(TAG, "onClick: service started");
 			} else {
 				Log.d(TAG, "onClick: stopping service");

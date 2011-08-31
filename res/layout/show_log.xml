@@ -8,7 +8,7 @@
 		android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge"
 		android:id="@+id/textLog" android:text="@string/log_label" android:textStyle="bold"></TextView>
 	<ScrollView android:scrollbarStyle="outsideInset" android:scrollbars="vertical" android:layout_width="fill_parent" android:isScrollContainer="true" android:scrollbarAlwaysDrawVerticalTrack="true" android:layout_height="375dp" android:layout_weight="1.12" android:id="@+id/scrollView1" android:layout_below="@+id/textLog" android:layout_above="@+id/btnBack">
-		<TableLayout android:layout_height="wrap_content" android:id="@+id/showLogLayout" android:layout_width="match_parent" android:orientation="vertical"></TableLayout>
+		<TableLayout android:layout_height="wrap_content" android:id="@+id/showLogLayout" android:layout_width="fill_parent" android:orientation="vertical"></TableLayout>
 	</ScrollView>
 	<com.google.ads.AdView ads:adUnitId="MY_AD_UNIT_ID" ads:adSize="IAB_BANNER" ads:loadAdOnCreate="true" android:layout_height="wrap_content" android:id="@+id/adView" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></com.google.ads.AdView>
 	<Button android:layout_height="wrap_content" android:id="@+id/btnBack" android:layout_width="wrap_content" android:text="@string/clear_log" android:layout_above="@+id/adView" android:layout_centerHorizontal="true"></Button>

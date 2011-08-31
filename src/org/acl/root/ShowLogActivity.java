@@ -44,8 +44,8 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 			TableRow.LayoutParams lp = new TableRow.LayoutParams();
 			lp.setMargins(2, 2, 2, 2);
 			textRow.setLayoutParams(new LinearLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, // width
-					LayoutParams.MATCH_PARENT)); // height
+					LayoutParams.FILL_PARENT, // width
+					LayoutParams.FILL_PARENT)); // height
 
 			textRow.addView(getTextView(getResources().getString(R.string.caller_log_tag),
 							Color.WHITE), lp);
@@ -56,8 +56,8 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 			callList.addView(textRow);
 			textRow = new TableRow(this);
 			textRow.setLayoutParams(new LinearLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, // width
-					LayoutParams.MATCH_PARENT)); // height
+					LayoutParams.FILL_PARENT, // width
+					LayoutParams.FILL_PARENT)); // height
 
 			textRow.addView(getTextView(	getResources().getString(R.string.date_log_tag),
 							Color.WHITE), lp);
@@ -68,7 +68,7 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 
 			callList.addView(textRow);
 			View line = new View(this);
-			LayoutParams vLp = new LayoutParams(LayoutParams.MATCH_PARENT, 2);
+			LayoutParams vLp = new LayoutParams(LayoutParams.FILL_PARENT, 2);
 			line.setBackgroundColor(Color.WHITE);
 			line.setLayoutParams(vLp);
 
