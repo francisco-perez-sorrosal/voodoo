@@ -4,6 +4,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.acl.root.core.BlackList;
+import org.acl.root.observers.CallObserver;
+import org.acl.root.observers.Logger;
+import org.acl.root.observers.UserNotifier;
+import org.acl.root.utils.CallInfo;
+import org.acl.root.utils.Contact;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,15 +39,8 @@ public class IncomingCallScanner extends Service {
 	private AudioManager am;
 	private int currentAudioMode;
 	
-	private boolean serviceRunning = false;
-
-	public boolean isServiceRunning() {
-		return serviceRunning;
-	}
-
 	/****************************************
 	 * Binder class
-	 *
 	 ****************************************/
 	public class LocalBinder extends Binder {
 		IncomingCallScanner getService() {
@@ -65,7 +65,6 @@ public class IncomingCallScanner extends Service {
 					Log.d(TAG, "Idle");
 					am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-					// Incoming call
 					String incomingNumber = intent
 							.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 					Log.d(TAG, "Incoming call " + incomingNumber);
@@ -110,21 +109,18 @@ public class IncomingCallScanner extends Service {
 	@Override
 	public void onCreate() {
 
-		if(!serviceRunning) {
-			// Add the log and UserNotifier as default observers
-			addCallObserver(Logger.INSTANCE);
-			addCallObserver(UserNotifier.INSTANCE);
-			BlackList.INSTANCE.loadMapFromFile(getApplicationContext());
-			am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-			currentAudioMode = am.getRingerMode();
-			am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-			IntentFilter filter = new IntentFilter();
-			filter.addAction("android.intent.action.PHONE_STATE");
-			filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
-			registerReceiver(phoneStateReceiver, filter);
-			serviceRunning = true;
-			Log.d(TAG, "Created");
-		}
+		// Add the log and UserNotifier as default observers
+		addCallObserver(Logger.INSTANCE);
+		addCallObserver(UserNotifier.INSTANCE);
+		BlackList.INSTANCE.loadMapFromFile(getApplicationContext());
+		am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		currentAudioMode = am.getRingerMode();
+		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("android.intent.action.PHONE_STATE");
+		filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
+		registerReceiver(phoneStateReceiver, filter);
+		Log.d(TAG, "Created");
 	}
 
 	@Override
@@ -132,27 +128,22 @@ public class IncomingCallScanner extends Service {
 		Log.d(TAG, "Received start id " + startId + ": " + intent);
 		UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
 				UserNotifier.CallScannerNotification.INIT);
-		// We want this service to continue running until it is explicitly
-		// stopped, so return sticky.
+		// Service will continue running (sticky) until it's explicitly stopped
 		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
-		if(serviceRunning) {
-			BlackList.INSTANCE.saveMapToFile(getApplicationContext());
-			// Stop filtering calls, otherwise they'll continue to be filtered
-			am.setRingerMode(currentAudioMode);
-			am = null;
-			unregisterReceiver(phoneStateReceiver);
-			removeCallObserver(Logger.INSTANCE);
-			removeCallObserver(UserNotifier.INSTANCE);
-			UserNotifier.INSTANCE.cancelCallScannerNotification(getApplicationContext());
-			serviceRunning = false;
-			Log.d(TAG, "Stopped");
-			// Tell the user we stopped.
-			Toast.makeText(getApplicationContext(), R.string.ics_service_stopped, Toast.LENGTH_SHORT).show();
-		}
+		BlackList.INSTANCE.saveMapToFile(getApplicationContext());
+		// Stop filtering calls, otherwise they'll continue to be filtered
+		am.setRingerMode(currentAudioMode);
+		am = null;
+		unregisterReceiver(phoneStateReceiver);
+		removeCallObserver(Logger.INSTANCE);
+		removeCallObserver(UserNotifier.INSTANCE);
+		UserNotifier.INSTANCE.cancelCallScannerNotification(getApplicationContext());
+		Toast.makeText(getApplicationContext(), R.string.ics_service_stopped, Toast.LENGTH_SHORT).show();
+		Log.d(TAG, "Stopped");
 	}
 
 	// ------------------------ End Lifecycle ---------------------------------
@@ -192,8 +183,8 @@ public class IncomingCallScanner extends Service {
 		return true;
 	}
 
-	public void filterAllCalls(boolean decission) {
-		filterAllCalls = decission;
+	public void filterAllCalls(boolean decision) {
+		filterAllCalls = decision;
 	}
 	
 	public boolean isAllCallsFilterEnabled() {

@@ -1,4 +1,6 @@
-package org.acl.root;
+package org.acl.root.observers;
+
+import org.acl.root.utils.CallInfo;
 
 public interface CallObserver {
 	/**

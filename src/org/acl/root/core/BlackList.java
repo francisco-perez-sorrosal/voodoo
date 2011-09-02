@@ -1,4 +1,4 @@
-package org.acl.root;
+package org.acl.root.core;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.acl.root.utils.InstrumentedConcurrentMap;
+import org.acl.root.utils.Contact;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,7 +1,10 @@
-package org.acl.root;
+package org.acl.root.observers;
 
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
+
+import org.acl.root.utils.CallInfo;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;

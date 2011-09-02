@@ -6,6 +6,7 @@
 		<item android:id="@+id/logs" android:icon="@drawable/linechart" android:titleCondensed="Log" android:title="Log of Filtered Calls"></item>
         <item android:id="@+id/twitter" android:icon="@drawable/bird" android:titleCondensed="Twitter" android:title="Twitter Data"></item>
         <item android:id="@+id/email" android:icon="@drawable/mail" android:titleCondensed="Email" android:title="Email"></item>
+        <item android:id="@+id/about" android:icon="@drawable/mail" android:titleCondensed="About" android:title="About"></item>
     </group>
     
 </menu>

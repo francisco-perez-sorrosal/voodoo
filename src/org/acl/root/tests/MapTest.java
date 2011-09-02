@@ -1,14 +1,12 @@
 package org.acl.root.tests;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.acl.root.utils.InstrumentedConcurrentMap;
-import org.junit.Test;
-
 import junit.framework.TestCase;
+
+import org.acl.root.core.InstrumentedConcurrentMap;
+import org.junit.Test;
 
 public class MapTest extends TestCase {
 
@@ -16,13 +14,13 @@ public class MapTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
-		map.put("650480799", "Francisco");
+		map.put("654480798", "Francisco");
 		map.put("650480700", "Juan");
 	}
 
 	@Test
 	public void testFranciscoPhoneIsPresent()  {
-		assertTrue(map.containsKey("650480799"));
+		assertTrue(map.containsKey("654480798"));
 	}
 	
 	@Test

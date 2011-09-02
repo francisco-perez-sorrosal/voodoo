@@ -1,5 +1,7 @@
 package org.acl.root;
 
+import org.acl.root.observers.Twitterer;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -31,7 +33,7 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.twitter_configuration);
 	    
-	    twitterPreferences = getApplicationContext().getSharedPreferences(MainActivity.TWITTER_PREFS, Activity.MODE_PRIVATE);
+	    twitterPreferences = getSharedPreferences(MainActivity.TWITTER_PREFS, Activity.MODE_PRIVATE);
 	    twitterMessage = (EditText) findViewById(R.id.twitterMessage);
 	    twitterMessage.setText(twitterPreferences.getString(MainActivity.TWITTER_MESSAGE, ""));
 		

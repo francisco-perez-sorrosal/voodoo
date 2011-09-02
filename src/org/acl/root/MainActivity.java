@@ -2,6 +2,17 @@ package org.acl.root;
 
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
+
+import java.util.ArrayList;
+
+import org.acl.root.core.BlackList;
+import org.acl.root.observers.Mailer;
+import org.acl.root.observers.Twitterer;
+import org.acl.root.observers.UserNotifier;
+import org.acl.root.utils.AboutDialogBuilder;
+import org.acl.root.utils.Contact;
+import org.acl.root.utils.Tools;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -15,23 +26,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -62,36 +75,30 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private ArrayAdapter<Contact> filteredContactsAdapter;
 
 	private IncomingCallScanner incomingCallScanner;
-	private boolean incomingCallScannerIsBound;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
 			Log.d(TAG, "Observers " + incomingCallScanner.nofObservers());
 			if(incomingCallScanner != null) {
-				Log.d(TAG, "onServiceConnected: " + incomingCallScanner.isServiceRunning());
 				startStopTB.setChecked(true);
-				filteredContactsAdapter = new ArrayAdapter<Contact>(getApplicationContext(),
+				filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
 						R.layout.contact_list_item, BlackList.INSTANCE.getBlackListAsArrayList());
 				filteredContactsLV.setAdapter(filteredContactsAdapter);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
-				incomingCallScannerIsBound = true;
 				if(incomingCallScanner.isAllCallsFilterEnabled())
 					filterAllCB.setChecked(true);
-				if(incomingCallScanner.containsObserver(Mailer.getInstance()))
+				if(incomingCallScanner.containsObserver(Mailer.INSTANCE))
 					emailTB.setChecked(true);
 				if(incomingCallScanner.containsObserver(Twitterer.INSTANCE))
 					twitterTB.setChecked(true);
-			} else {
-				Log.d(TAG, "onServiceConnected: IncomingCallScanner is null");
 			}
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
+			Log.d(TAG, "onServiceDisconnected: Incoming Call Scanner Disconnected");
 			incomingCallScanner = null;
-			incomingCallScannerIsBound = false;
-			Log.d(TAG, "onServiceDisconnected: Incoming Call Scanner Disconnected");	    
 		}
 	};
 
@@ -134,11 +141,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		// Do not call clearTwitterConnection() on destroying this activity
-		// cause if twitter is enabled messages must be sent!!!
-		// Clean incoming call scanner service connection
+		// Don't call clearTwitter/MailConnection() on destroying this activity
+		// cause, if enabled, messages must be sent!!!
 		unbindService(mConnection);
-		incomingCallScannerIsBound = false;
 		Log.d(TAG, "onDestroy");
 	}
 
@@ -166,26 +171,34 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.contacts:			
-			if(incomingCallScannerIsBound) {
+			if(incomingCallScanner != null) {
 				Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
 				startActivityForResult(intentContact, PICK_CONTACT);
 			} else {
-				Toast.makeText(this, "IncomingCallScanner not bound. Connect first!", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getResources().getString(R.string.ics_service_not_bound), Toast.LENGTH_SHORT).show();
 			}
 			break;
 		case R.id.twitter:
 			launchTwitterConfigurationActivity();
 			break;
 		case R.id.logs:
-			if(incomingCallScannerIsBound) {
+			if(incomingCallScanner != null)
 				UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
 						UserNotifier.CallScannerNotification.SHOW_LOG);
-			}
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);
 			break;
 		case R.id.email:
 			launchEmailUserDataActivity();
+			break;
+		case R.id.about:
+			AlertDialog builder;
+			try {
+				builder = AboutDialogBuilder.create(this);
+				builder.show();
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
 			break;
 		}
 		return true;
@@ -196,7 +209,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		
 		case PICK_CONTACT:
 			if(intent != null) { // This is required because the user cannot select any contact
-				Contact  contact = getContactInfo(intent);
+				Contact  contact = Contact.getContactFromAndroidUserContacts(this, intent.getData().getLastPathSegment());
 				// Your class variables now have the data, so do something with it
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
@@ -205,24 +218,23 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						filteredContactsAdapter.add(contact);
 						filteredContactsAdapter.notifyDataSetChanged();
 						filteredContactsLV.refreshDrawableState();
-						Toast.makeText(this, name + " has been filtered", Toast.LENGTH_SHORT).show();
+						Log.d(TAG, name + " has been filtered");
 					} else {
-						Toast.makeText(this, "Contact already filtered", Toast.LENGTH_SHORT).show();
+						Toast.makeText(this, getResources().getString(R.string.contact_already_filtered), Toast.LENGTH_SHORT).show();
 					}
 				} else {
-					Toast.makeText(this, "Some contact data (Name or Phone Numer) is missing", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getResources().getString(R.string.missing_contact_data), Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(this, "No contact was selected", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getResources().getString(R.string.no_contact_selected), Toast.LENGTH_SHORT).show();
 			}
 			break;
 			
 		case GET_EMAIL_USER_DATA:
-			if (resultCode == Activity.RESULT_OK) {
+			if (resultCode == Activity.RESULT_OK)
 				saveEmailUserDataInAppPreferences(
 						(String) intent.getExtras().get(EMAIL),
 						(String) intent.getExtras().get(EMAIL_PASSWORD));
-			}
 			break;
 			
 		case GET_TWITTER_ACCESS_TOKEN:
@@ -236,13 +248,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			    				twitter.getOAuthAccessToken(twitterOAuthRequestToken, oauthVerifier);
 			    		// Here we can safely save Access Token and inform the user
 			        saveTwitterOAuthAccessTokenInAppPreferences(receivedTwitterOAuthAccessToken);
-					Toast.makeText(this, "Now you can connect to Twitter", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getResources().getString(R.string.no_contact_selected), Toast.LENGTH_SHORT).show();
 			    } catch (TwitterException e) {
-					Toast.makeText(this, "Error getting the Twitter Access Token", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getResources().getString(R.string.twitter_at_error), Toast.LENGTH_SHORT).show();
 			    }
 			    
 			} else {
-				Toast.makeText(this, "Twitter Authorization Failed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getResources().getString(R.string.twitter_auth_failed), Toast.LENGTH_SHORT).show();
 			}
 			break;
 		}
@@ -275,23 +287,22 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			break;
 		case R.id.filterAllCB:
 			if(filterAllCB.isChecked()) {
-				if(incomingCallScannerIsBound) {
+				if(incomingCallScanner != null) {
 					incomingCallScanner.filterAllCalls(true);
 				} else {
 					filterAllCB.setChecked(false);
 				}
 			} else {				
-				if(incomingCallScannerIsBound) {
+				if(incomingCallScanner != null)
 					clearFilterForAllCallsFromService();
-				} 
 			}
 			break;
 		case R.id.twitterTB:
 			if(twitterTB.isChecked()) {
-				if(incomingCallScannerIsBound) {
+				if(incomingCallScanner != null) {
 					
-					if(!isNetworkAvailable()) {
-						Toast.makeText(this, "Network connection not available", Toast.LENGTH_SHORT).show();
+					if(!Tools.isNetworkAvailable(getApplicationContext())) {
+						Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_SHORT).show();
 						clearTwitterConnectionFromService();
 						return;
 					}
@@ -301,37 +312,37 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 					
 					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
 							&& isTwitterOAuthAccessTokenValid(twitterOAuthAccessToken)) {
-						Log.d(TAG, "THIS MUST NOT BE HERE");
 						// Both values were stored properly, so...
 						incomingCallScanner.addCallObserver(Twitterer.INSTANCE);
 						
 					} else {
-						
 						prepareTwitterConnection();
-						
 					}
 				} else {
 					twitterTB.setChecked(false);
 				}
 			} else {
-				clearTwitterConnectionFromService();
+				if(incomingCallScanner != null)
+					clearTwitterConnectionFromService();
 			}
 			break;
 		case R.id.emailTB:
 			if(emailTB.isChecked()) {
-				if(incomingCallScannerIsBound) {
+				if(incomingCallScanner != null) {
 					
-					if(!isNetworkAvailable()) {
-						Toast.makeText(this, "Network connection not available", Toast.LENGTH_SHORT).show();
+					if(!Tools.isNetworkAvailable(getApplicationContext())) {
+						Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_SHORT).show();
 						clearEmailConnectionFromService();
 						return;
 					}
-					incomingCallScanner.addCallObserver(Mailer.getInstance());
+					//incomingCallScanner.addCallObserver(Mailer.getInstance());
+					incomingCallScanner.addCallObserver(Mailer.INSTANCE);
 				} else {
 					emailTB.setChecked(false);
 				}
 			} else {
-				clearEmailConnectionFromService();
+				if(incomingCallScanner != null) 
+					clearEmailConnectionFromService();
 			}
 			break;
 		}
@@ -342,16 +353,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		filterAllCB.setChecked(false);
 	}
 
-	// Get the required elements to get a Twitter connection
 	private void prepareTwitterConnection() {
 		try {
 			// Step 1: Get the request token. If the consumer data is wrong a an exception will be thrown
 			twitterOAuthRequestToken = getTwitterOAuthRequestToken();
 			// Step 2: Use request token to get access token by means of an intermediate activity
-			Toast.makeText(this, "Please, put your Twitter user and password", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getResources().getString(R.string.twitter_enter_consumer_data), Toast.LENGTH_SHORT).show();
 			launchTwitterWebviewActivity(twitterOAuthRequestToken);
 		} catch (TwitterException e) {
-			Toast.makeText(this, "Please, set properly your Twitter Consumer Key and Secret on the Main Menu", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getResources().getString(R.string.twitter_set_right_consumer_data), Toast.LENGTH_SHORT).show();
 		} finally {
 			twitterTB.setChecked(false);
 		}
@@ -362,88 +372,17 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		Log.d(TAG, "onItemClick");
 		final Contact contact = (Contact) filteredContactsLV.getItemAtPosition(position);
 		AlertDialog.Builder adb=new AlertDialog.Builder(MainActivity.this);
-		adb.setTitle("Delete?");
+		adb.setTitle(getResources().getString(R.string.delete_op));
 		adb.setMessage("Are you sure you want to delete " + contact.getName());
-		adb.setNegativeButton("Cancel", null);
-		adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
+		adb.setPositiveButton(getResources().getString(R.string.ok_tag), new AlertDialog.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				BlackList.INSTANCE.removeContactFromBlackList(contact);
 				filteredContactsAdapter.remove(contact);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
 			}});
+		adb.setNegativeButton(getResources().getString(R.string.cancel_tag), null);
 		adb.show();
-	}
-
-	protected Contact getContactInfo(Intent intent) {
-
-		Contact contact = null;
-		
-		Cursor cursor =  managedQuery(intent.getData(), null, null, null, null);     
-		startManagingCursor(cursor);
-		Log.d(TAG, "getContactInfo. Elements: " + cursor.getCount());
-
-		while (cursor.moveToNext()) {           
-			String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)); 
-
-			Contact.Builder contactBuilder = new Contact.Builder(contactId, name);
-
-			String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
-
-			if (hasPhone.equalsIgnoreCase("1"))
-				hasPhone = "true";
-			else
-				hasPhone = "false" ;
-
-			if (Boolean.parseBoolean(hasPhone)) {
-				Cursor phones = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId,null, null);
-				while (phones.moveToNext()) {
-					String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-					// When receiving a call the number includes spaces, brackets and hyphens.
-					phoneNumber = phoneNumber.replaceAll("[\\s\\-()]", "");
-					contactBuilder.addPhoneNumber(phoneNumber);
-					Log.d(TAG, "getContactInfo. Phone Number: " + phoneNumber);
-				}
-				phones.close();
-			}
-
-			// Find Email Addresses
-			Cursor emails = getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId,null, null);
-			while (emails.moveToNext()) {
-				String emailAddress = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
-				contactBuilder.addEmailAddress(emailAddress);
-			}
-			emails.close();
-
-			Cursor address = getContentResolver().query(
-					ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI,
-					null,
-					ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + " = " + contactId,
-					null, null);
-			while (address.moveToNext()) { 
-				// These are all private class variables, don't forget to create them.
-				contactBuilder.poBox(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POBOX)));
-				contactBuilder.street(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET)));
-				contactBuilder.city(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY)));
-				contactBuilder.state(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION)));
-				contactBuilder.postalCode(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE)));
-				contactBuilder.country(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY)));
-				contactBuilder.type(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE)));
-			}  //address.moveToNext()   
-
-			contact = contactBuilder.build();
-		}  //while (cursor.moveToNext())        
-		cursor.close();
-		stopManagingCursor(cursor);
-		return contact;
-	}
-	
-	private boolean isNetworkAvailable() {
-	    ConnectivityManager connectivityManager 
-	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	    return activeNetworkInfo != null;
 	}
 	
 	// ------------------------- Twitter Related Stuff ------------------------
@@ -479,9 +418,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	}
 		
 	private void clearTwitterConnectionFromService() {
-			if(incomingCallScannerIsBound)
-				incomingCallScanner.removeCallObserver(Twitterer.INSTANCE);
-			
+			incomingCallScanner.removeCallObserver(Twitterer.INSTANCE);
 			twitterOAuthConsumerData = null;
 			twitterOAuthRequestToken = null;
 			twitterOAuthAccessToken =  null;
@@ -498,7 +435,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	}
 	
 	private OAuthAccessToken loadTwitterOAuthAccessTokenFromAppPreferences() {
-		Log.d(TAG, "onClick: inTwitterAT");
 		return new OAuthAccessToken(
 				twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" )
 				,twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ));
@@ -509,7 +445,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		    .putString(TWITTER_OAUTH_ACCESS_TOKEN, accessToken.getToken())
 		    .putString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, accessToken.getTokenSecret())
 		    .commit();
-		Toast.makeText(this, "Twitter OAuth Access Token saved in Preferences", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, getResources().getString(R.string.twitter_prefs_saved), Toast.LENGTH_SHORT).show();
 	}
 	
 	private  void launchTwitterWebviewActivity(RequestToken twitterOAuthRequestToken) {
@@ -555,7 +491,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private  SharedPreferences emailPreferences;
 	
 	private void launchEmailUserDataActivity() {
-		Intent i = new Intent(this, EmailUserDataActivity.class);
+		Intent i = new Intent(this, EmailConfigurationActivity.class);
 		startActivityForResult(i, GET_EMAIL_USER_DATA);
 	}
 
@@ -564,16 +500,56 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		    .putString(EMAIL, email)
 		    .putString(EMAIL_PASSWORD, password)
 		    .commit();
-		Toast.makeText(this, "Email user data saved in Preferences", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getResources().getString(R.string.email_prefs_saved), Toast.LENGTH_LONG).show();
 	}
 	
 	private void clearEmailConnectionFromService() {
-		if(incomingCallScannerIsBound) {
-			incomingCallScanner.removeCallObserver(Mailer.getInstance());
-		}
+		//incomingCallScanner.removeCallObserver(Mailer.getInstance());
+		incomingCallScanner.removeCallObserver(Mailer.INSTANCE);
 		emailTB.setChecked(false);
 	}
 	
-	// ---------------------- End Mail related stuff -------------------------
+	// -------------------------- Private classes -----------------------------
 	
+	/**
+	 * Allows to present the contents of the Blacklist as well-defined rows
+	 * 
+	 * Francisco PŽrez-Sorrosal (fperez)
+	 *
+	 */
+	private class DualLineArrayAdapter extends ArrayAdapter<Contact> {
+
+		private ArrayList<Contact> contacts;
+
+	    public DualLineArrayAdapter(Context context, int textViewResourceId, ArrayList<Contact> contacts) {
+	            super(context, textViewResourceId, contacts);
+	            this.contacts = contacts;
+	    }
+
+	    @Override
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	            View v = convertView;
+	            if (v == null) {
+	                LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	                v = vi.inflate(R.layout.contact_list_item, null);
+	            }
+	            Contact contact = contacts.get(position);
+	            if (contact != null) {
+	        			ImageView contactPhoto = (ImageView) v.findViewById(R.id.contactPhoto);
+	                TextView contactName = (TextView) v.findViewById(R.id.contactName);
+	                TextView contactPhones = (TextView) v.findViewById(R.id.contactPhones);
+	                
+	                if (contactPhoto != null) {
+	                      contactPhoto.setImageBitmap(contact.getPhoto());                            
+	                }
+	                if (contactName != null) {
+	                      contactName.setText(contact.getName());                            
+	                }
+	                if(contactPhones != null){
+	                      contactPhones.setText(contact.getPhoneNumbers().toString());
+	                }
+	            }
+	            return v;
+	    }
+	}
 }

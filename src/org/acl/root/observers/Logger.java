@@ -1,4 +1,4 @@
-package org.acl.root;
+package org.acl.root.observers;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,6 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.acl.root.utils.CallInfo;
 
 import android.content.Context;
 import android.util.Log;
@@ -90,7 +92,7 @@ public enum Logger implements CallObserver {
 		}
 	}
 	
-	public void saveLogToLogFile(Context context) {
+	private void saveLogToLogFile(Context context) {
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 

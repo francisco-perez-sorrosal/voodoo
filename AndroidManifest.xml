@@ -26,7 +26,7 @@
 		</activity>
 		<service android:enabled="true" android:name=".IncomingCallScanner" />
 		<activity android:name=".ShowLogActivity" />
-		<activity android:name=".EmailUserDataActivity" />
+		<activity android:name=".EmailConfigurationActivity" />
 		<activity android:name=".TwitterConfigurationActivity" />
 		<activity android:name=".TwitterWebviewActivity" />
 		<!-- Google Ads Activity-->

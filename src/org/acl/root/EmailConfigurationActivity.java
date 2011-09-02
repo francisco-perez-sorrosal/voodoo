@@ -16,7 +16,7 @@ import android.widget.Toast;
  * @author Francisco PŽrez-Sorrosal (fperez)
  *
  */
-public class EmailUserDataActivity extends Activity implements OnClickListener {
+public class EmailConfigurationActivity extends Activity implements OnClickListener {
 	
 	private EditText email;
 	private EditText password;

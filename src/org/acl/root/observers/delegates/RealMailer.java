@@ -1,4 +1,4 @@
-package org.acl.root;
+package org.acl.root.observers.delegates;
 
 import java.util.Date;
 import java.util.List;
@@ -20,15 +20,18 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
+import org.acl.root.R;
+import org.acl.root.utils.CallInfo;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
 
-public class Mailer extends Authenticator implements CallObserver {
+public class RealMailer extends Authenticator {
 
-	private static final String TAG = "Mailer";
+	private static final String TAG = "RealMailer";
 	private static final String DEFAULT_FROM_EMAIL = "no-reply@linkingenius.com";
 	private static final String DEFAULT_SUBJECT = "Autoresponse from Blacklist Android App";
 
@@ -36,14 +39,6 @@ public class Mailer extends Authenticator implements CallObserver {
 	
 	protected static final String EMAIL = "email_user";
 	protected static final String EMAIL_PASSWORD = "email_password";
-	
-	public static  Mailer instance;
-	
-	public static Mailer getInstance() {
-		if(instance == null)
-			instance = new Mailer();
-		return instance;
-	}
 	
 	private String user;
 	private String password;
@@ -62,13 +57,18 @@ public class Mailer extends Authenticator implements CallObserver {
 	private boolean debuggable;
 
 	/**
-	 * First version of Mailer.
+	 * Implements the required functionality for sending e-mails. It represents
+	 * the delegate part of a Delegation pattern. The delegator role is played
+	 * by the @Mailer class
 	 * 
 	 * Check this for more info:
 	 * http://www.jondev.net/articles/Sending_Emails_without_User_Intervention_
 	 * %28no_Intents%29_in_Android
+	 * 
+	 * @author Francisco PŽrez-Sorrosal (fperez)
+	 *  
 	 */
-	private Mailer() {
+	public RealMailer() {
 		Log.d(TAG, "Constructor");
 		
 		host = "smtp.gmail.com"; // default smtp server
@@ -147,57 +147,17 @@ public class Mailer extends Authenticator implements CallObserver {
 
 		multipart.addBodyPart(messageBodyPart);
 	}
-
+	
 	@Override
 	public PasswordAuthentication getPasswordAuthentication() {
 		return new PasswordAuthentication(user, password);
 	}
 
-	private Properties setMailProperties() {
-		Properties props = new Properties();
-
-		props.put("mail.smtp.host", host);
-
-		if (debuggable) {
-			props.put("mail.debug", "true");
-		}
-
-		if (auth) {
-			props.put("mail.smtp.auth", "true");
-		}
-
-		props.put("mail.smtp.port", port);
-		props.put("mail.smtp.socketFactory.port", sport);
-		props.put("mail.smtp.socketFactory.class",
-				"javax.net.ssl.SSLSocketFactory");
-		props.put("mail.smtp.socketFactory.fallback", "false");
-
-		return props;
-	}
-
-	// The getters and setters
-	
-	private void setTo(String[] toArr) {
-		this.to = toArr;
-	}
-
-	private void setFrom(String string) {
-		this.from = string;
-	}
-
-	private void setSubject(String string) {
-		this.subject = string;
-	}
-	
 	public void setBody(String body) {
 		this.body = body;
 	}
-
-	/**
-	 * Observer pattern for incoming calls
-	 */
-	@Override
-	public void callNotification(CallInfo callInfo) {
+	
+	public void processNotification(CallInfo callInfo) {
 		List<String> emailAddresses = callInfo.getEmailAddresses();
 		if(emailAddresses.size() > 0) {
 			Log.d(TAG, "Sending email to " + emailAddresses.toString());
@@ -220,5 +180,41 @@ public class Mailer extends Authenticator implements CallObserver {
 			Toast.makeText(callInfo.getContext(), R.string.no_email_addresses_found, Toast.LENGTH_SHORT).show();
 		}
 	}
+	
+	// ------------------------- Private methods ------------------------------
+	
+	private Properties setMailProperties() {
+		Properties props = new Properties();
 
+		props.put("mail.smtp.host", host);
+
+		if (debuggable) {
+			props.put("mail.debug", "true");
+		}
+
+		if (auth) {
+			props.put("mail.smtp.auth", "true");
+		}
+
+		props.put("mail.smtp.port", port);
+		props.put("mail.smtp.socketFactory.port", sport);
+		props.put("mail.smtp.socketFactory.class",
+				"javax.net.ssl.SSLSocketFactory");
+		props.put("mail.smtp.socketFactory.fallback", "false");
+
+		return props;
+	}
+
+	private void setFrom(String string) {
+		this.from = string;
+	}
+
+	private void setTo(String[] toArr) {
+		this.to = toArr;
+	}
+
+	private void setSubject(String string) {
+		this.subject = string;
+	}
+	
 }
