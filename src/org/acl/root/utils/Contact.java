@@ -1,16 +1,12 @@
 package org.acl.root.utils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.acl.root.R;
 
-import android.app.Activity;
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,15 +21,13 @@ import android.util.Log;
  * @author Francisco PŽrez-Sorrosal (fperez)
  * 
  */
-public class Contact implements Serializable {
+public class Contact {
 
 	private static final String TAG = "Contact";
 
-	private static final long serialVersionUID = 83472973490823798L;
-
-	private  String id;
-	private  String name;
-	private transient Bitmap photo;
+	private String id;
+	private String name;
+	private Bitmap photo;
 	private ArrayList<String> phoneNumbers;
 	private ArrayList<String> emailAddresses;
 	private String poBox;
@@ -48,9 +42,9 @@ public class Contact implements Serializable {
 		// Required
 		private String id;
 		private String name;
+		private Bitmap photo;
 
 		// Optional
-		private Bitmap photo;
 		private ArrayList<String> phoneNumbers = new ArrayList<String>();
 		private ArrayList<String> emailAddresses = new ArrayList<String>();
 		private String poBox = "";
@@ -61,9 +55,10 @@ public class Contact implements Serializable {
 		private String country = "";
 		private String type = "";
 
-		public Builder(String id, String name) {
+		public Builder(String id, String name, Bitmap photo) {
 			this.id = id;
 			this.name = name;
+			this.photo = photo;
 		}
 
 		public Builder addPhoto(Bitmap userPhoto) {
@@ -137,6 +132,10 @@ public class Contact implements Serializable {
 		type = builder.type;
 	}
 
+	public String getId() {
+		return id;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -153,50 +152,46 @@ public class Contact implements Serializable {
 		return emailAddresses;
 	}
 
-	private void writeObject(ObjectOutputStream s) throws IOException {
-		s.defaultWriteObject();
-	}
-
-	private void readObject(ObjectInputStream s) throws IOException,
-			ClassNotFoundException {
-		s.defaultReadObject();
-	}
-
 	@Override
 	public String toString() {
 		return getName() + " " + getPhoneNumbers();
 	}
 
-	public static Contact getContactFromAndroidUserContacts(Activity activity, String id) {
+	/**
+	 * Retrieves a specific contact from the Android list of contacts.
+	 * See Chapter 7 of Beginning Android Application Development (Wrox)
+	 * 
+	 * @param context The application context. Required to perform queries
+	 * @param id The contact id to locate
+	 * @return A ContactBuilder object containing the desired info about the 
+	 * 	contact and ready to be instantiated
+	 */
+	public static Contact.Builder getContactFromAndroid(Context context, String id) {
 
-		Contact contact = null;
+		Contact.Builder contactBuilder = null;
 
-		// Original line: Cursor cursor =  activity.managedQuery(intent.getData(), null, null, null, null);
-		Cursor cursor =  activity.managedQuery(
+		Cursor cursor =  context.getContentResolver().query(
 				ContactsContract.Contacts.CONTENT_URI
 				, null
 				, ContactsContract.Contacts._ID + " = ?"
 				, new String[] { id }
 				, null);
-		activity.startManagingCursor(cursor);
 		Log.d(TAG, "Elements: " + cursor.getCount());
 
 		while (cursor.moveToNext()) {           
 			String contactId = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 			String name = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME)); 
-
-			Contact.Builder contactBuilder = new Contact.Builder(contactId, name);
-	
             int photoID=cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts.PHOTO_ID));
     			Bitmap userPhoto;
             if (photoID!=0) {
                 Uri uri=ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, Long.parseLong(id));
-                InputStream in = ContactsContract.Contacts.openContactPhotoInputStream(activity.getContentResolver(), uri);
+                InputStream in = ContactsContract.Contacts.openContactPhotoInputStream(context.getContentResolver(), uri);
                 userPhoto = BitmapFactory.decodeStream(in);
             } else {
-		        userPhoto = BitmapFactory.decodeResource(activity.getResources(), R.drawable.icon);
+		        userPhoto = BitmapFactory.decodeResource(context.getResources(), R.drawable.icon);
 		    }
-            contactBuilder.addPhoto(userPhoto);
+
+            contactBuilder = new Contact.Builder(contactId, name, userPhoto);
 
 			String hasPhone = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
@@ -206,7 +201,7 @@ public class Contact implements Serializable {
 				hasPhone = "false" ;
 
 			if (Boolean.parseBoolean(hasPhone)) {
-				Cursor phones = activity.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId,null, null);
+				Cursor phones = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,ContactsContract.CommonDataKinds.Phone.CONTACT_ID +" = "+ contactId,null, null);
 				while (phones.moveToNext()) {
 					String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 					// When receiving a call the number includes spaces, brackets and hyphens.
@@ -218,14 +213,14 @@ public class Contact implements Serializable {
 			}
 
 			// Find Email Addresses
-			Cursor emails = activity.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId,null, null);
+			Cursor emails = context.getContentResolver().query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,null,ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = " + contactId,null, null);
 			while (emails.moveToNext()) {
 				String emailAddress = emails.getString(emails.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
 				contactBuilder.addEmailAddress(emailAddress);
 			}
 			emails.close();
 
-			Cursor address = activity.getContentResolver().query(
+			Cursor address = context.getContentResolver().query(
 					ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_URI,
 					null,
 					ContactsContract.CommonDataKinds.StructuredPostal.CONTACT_ID + " = " + contactId,
@@ -241,10 +236,8 @@ public class Contact implements Serializable {
 				contactBuilder.type(address.getString(address.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE)));
 			}  //address.moveToNext()   
 
-			contact = contactBuilder.build();
 		}  //while (cursor.moveToNext())        
 		cursor.close();
-		activity.stopManagingCursor(cursor);
-		return contact;
+		return contactBuilder;
 	}
 }

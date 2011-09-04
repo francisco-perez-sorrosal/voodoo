@@ -30,12 +30,12 @@ public enum BlackList {
 			new InstrumentedConcurrentMap<String, Contact>(
 					new ConcurrentHashMap<String, Contact>());
 	
-	public ArrayList<Contact> getBlackListAsArrayList() {
+	public ArrayList<Contact> toArrayList() {
 		Set<Contact> duplicateContactFilter = new HashSet<Contact>(blackList.values());
 		return  new ArrayList<Contact>(duplicateContactFilter);
 	}
 
-	public Contact addContactToBlackList(Contact contact) {
+	public Contact addContact(Contact contact) {
 		Contact previousValue = null;
 		String name = contact.getName();
 		
@@ -47,7 +47,7 @@ public enum BlackList {
 		return previousValue;
 	}
 
-	public Contact removeContactFromBlackList(Contact contact) {
+	public Contact removeContact(Contact contact) {
 		Contact previousValue = null;
 		String name = contact.getName();
 		
@@ -66,7 +66,7 @@ public enum BlackList {
 		return blackList.get(contact);
 	}
 	
-	public void loadMapFromFile(Context context){
+	public void loadFromFile(Context context){
 		FileInputStream fis = null;
 		ObjectInputStream ois = null;
 
@@ -74,9 +74,12 @@ public enum BlackList {
 			fis = context.openFileInput(FILE);
 			ois = new ObjectInputStream(fis);
 			
-			List<Contact> storedBlackList = (ArrayList<Contact>) ois.readObject();
-			for(Contact contact : storedBlackList) {
-			   Log.d(TAG, "Reading " + contact);
+			int numElements = ois.readInt();
+
+			for (int i = 0; i < numElements; i++) {
+			   String contactId = (String) ois.readObject();
+			   Contact contact = Contact
+					   .getContactFromAndroid(context, contactId).build();
 			   for(String phone : contact.getPhoneNumbers()) {
 				   blackList.putIfAbsent(phone, contact);
 				   Log.d(TAG, "Phone filtered: " + phone);
@@ -99,16 +102,19 @@ public enum BlackList {
 		}
 	}
 
-	public void saveMapToFile(Context context) {
+	public void saveToFile(Context context) {
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 
 		try {
 			fos = context.openFileOutput(FILE, Context.MODE_PRIVATE);
 			oos =  new ObjectOutputStream(fos);
-			
-			List<Contact> blackListToStore = getBlackListAsArrayList();
-			oos.writeObject(blackListToStore);
+			List<Contact> blackListToStore = toArrayList();
+			oos.writeInt(blackListToStore.size());
+			// Write out all elements in the proper order. 
+			for (Contact contact : blackListToStore) {
+				oos.writeObject(contact.getId());
+			}
 			Log.i(TAG, "Blacklist saved. # of contacts: " + blackListToStore.size());
 		} catch (FileNotFoundException e) {
 			Log.d(TAG, "FileNotFoundException", e);
@@ -124,5 +130,4 @@ public enum BlackList {
 			blackList.clear();
 		}
 	}
-
 }

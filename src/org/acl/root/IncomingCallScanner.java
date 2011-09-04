@@ -112,7 +112,7 @@ public class IncomingCallScanner extends Service {
 		// Add the log and UserNotifier as default observers
 		addCallObserver(Logger.INSTANCE);
 		addCallObserver(UserNotifier.INSTANCE);
-		BlackList.INSTANCE.loadMapFromFile(getApplicationContext());
+		BlackList.INSTANCE.loadFromFile(getApplicationContext());
 		am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 		currentAudioMode = am.getRingerMode();
 		am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
@@ -134,7 +134,7 @@ public class IncomingCallScanner extends Service {
 
 	@Override
 	public void onDestroy() {
-		BlackList.INSTANCE.saveMapToFile(getApplicationContext());
+		BlackList.INSTANCE.saveToFile(getApplicationContext());
 		// Stop filtering calls, otherwise they'll continue to be filtered
 		am.setRingerMode(currentAudioMode);
 		am = null;

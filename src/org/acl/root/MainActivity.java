@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			if(incomingCallScanner != null) {
 				startStopTB.setChecked(true);
 				filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
-						R.layout.contact_list_item, BlackList.INSTANCE.getBlackListAsArrayList());
+						R.layout.contact_list_item, BlackList.INSTANCE.toArrayList());
 				filteredContactsLV.setAdapter(filteredContactsAdapter);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
@@ -198,11 +198,14 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		
 		case PICK_CONTACT:
 			if(intent != null) { // This is required because the user cannot select any contact
-				Contact  contact = Contact.getContactFromAndroidUserContacts(this, intent.getData().getLastPathSegment());
+				Contact contact = Contact
+						.getContactFromAndroid(
+								this, 
+								intent.getData().getLastPathSegment()).build();
 				// Your class variables now have the data, so do something with it
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
-					Contact previousContact = BlackList.INSTANCE.addContactToBlackList(contact);
+					Contact previousContact = BlackList.INSTANCE.addContact(contact);
 					if(previousContact == null) { // To avoid duplicates
 						filteredContactsAdapter.add(contact);
 						filteredContactsAdapter.notifyDataSetChanged();
@@ -306,7 +309,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		adb.setMessage("Are you sure you want to delete " + contact.getName());
 		adb.setPositiveButton(getResources().getString(R.string.ok_tag), new AlertDialog.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				BlackList.INSTANCE.removeContactFromBlackList(contact);
+				BlackList.INSTANCE.removeContact(contact);
 				filteredContactsAdapter.remove(contact);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
