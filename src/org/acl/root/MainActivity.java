@@ -1,8 +1,5 @@
 package org.acl.root;
 
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
-
 import java.util.ArrayList;
 
 import org.acl.root.core.BlackList;
@@ -13,11 +10,6 @@ import org.acl.root.utils.AboutDialogBuilder;
 import org.acl.root.utils.Contact;
 import org.acl.root.utils.Tools;
 
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -25,7 +17,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -64,8 +55,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private static final String TAG = "MainActivity";
 	
 	private static final int PICK_CONTACT = 0;
-	private static final int GET_EMAIL_USER_DATA = 1;
-	private static final int GET_TWITTER_ACCESS_TOKEN = 2;
 
 	private ToggleButton startStopTB;
 	private CheckBox filterAllCB;
@@ -132,8 +121,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		bindService(new Intent(this, 
 				IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
 		
-		emailPreferences = getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
-		twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
+		AdRequest addRequest = new AdRequest();
+		addRequest.addTestDevice(AdRequest.TEST_EMULATOR);
 		
 		Log.d(TAG, "onCreate");
 	}
@@ -229,34 +218,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				Toast.makeText(this, getResources().getString(R.string.no_contact_selected), Toast.LENGTH_SHORT).show();
 			}
 			break;
-			
-		case GET_EMAIL_USER_DATA:
-			if (resultCode == Activity.RESULT_OK)
-				saveEmailUserDataInAppPreferences(
-						(String) intent.getExtras().get(EMAIL),
-						(String) intent.getExtras().get(EMAIL_PASSWORD));
-			break;
-			
-		case GET_TWITTER_ACCESS_TOKEN:
-			if (resultCode == Activity.RESULT_OK) {
-				
-			    String oauthVerifier = (String) intent.getExtras().get(TWITTER_OAUTH_VERIFIER);
-			 
-			    try {
-			        // Pair up our request with the response
-			    		AccessToken receivedTwitterOAuthAccessToken = 
-			    				twitter.getOAuthAccessToken(twitterOAuthRequestToken, oauthVerifier);
-			    		// Here we can safely save Access Token and inform the user
-			        saveTwitterOAuthAccessTokenInAppPreferences(receivedTwitterOAuthAccessToken);
-					Toast.makeText(this, getResources().getString(R.string.no_contact_selected), Toast.LENGTH_SHORT).show();
-			    } catch (TwitterException e) {
-					Toast.makeText(this, getResources().getString(R.string.twitter_at_error), Toast.LENGTH_SHORT).show();
-			    }
-			    
-			} else {
-				Toast.makeText(this, getResources().getString(R.string.twitter_auth_failed), Toast.LENGTH_SHORT).show();
-			}
-			break;
 		}
 		
 	}
@@ -305,19 +266,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						Toast.makeText(this, getResources().getString(R.string.no_network), Toast.LENGTH_SHORT).show();
 						clearTwitterConnectionFromService();
 						return;
-					}
-					
-					twitterOAuthConsumerData = new OAuthAccessToken(CONSUMER_KEY, CONSUMER_SECRET); 
-					twitterOAuthAccessToken = loadTwitterOAuthAccessTokenFromAppPreferences();
-					
-					if(isTwitterOAuthConsumerDataValid(twitterOAuthConsumerData)
-							&& isTwitterOAuthAccessTokenValid(twitterOAuthAccessToken)) {
-						// Both values were stored properly, so...
-						incomingCallScanner.addCallObserver(Twitterer.INSTANCE);
-						
-					} else {
-						prepareTwitterConnection();
-					}
+					}					
+					incomingCallScanner.addCallObserver(Twitterer.INSTANCE);
 				} else {
 					twitterTB.setChecked(false);
 				}
@@ -335,35 +285,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						clearEmailConnectionFromService();
 						return;
 					}
-					//incomingCallScanner.addCallObserver(Mailer.getInstance());
 					incomingCallScanner.addCallObserver(Mailer.INSTANCE);
 				} else {
 					emailTB.setChecked(false);
 				}
 			} else {
-				if(incomingCallScanner != null) 
+				if(incomingCallScanner != null)
 					clearEmailConnectionFromService();
 			}
 			break;
-		}
-	}
-
-	private void clearFilterForAllCallsFromService() {
-		incomingCallScanner.filterAllCalls(false);
-		filterAllCB.setChecked(false);
-	}
-
-	private void prepareTwitterConnection() {
-		try {
-			// Step 1: Get the request token. If the consumer data is wrong a an exception will be thrown
-			twitterOAuthRequestToken = getTwitterOAuthRequestToken();
-			// Step 2: Use request token to get access token by means of an intermediate activity
-			Toast.makeText(this, getResources().getString(R.string.twitter_enter_consumer_data), Toast.LENGTH_SHORT).show();
-			launchTwitterWebviewActivity(twitterOAuthRequestToken);
-		} catch (TwitterException e) {
-			Toast.makeText(this, getResources().getString(R.string.twitter_set_right_consumer_data), Toast.LENGTH_SHORT).show();
-		} finally {
-			twitterTB.setChecked(false);
 		}
 	}
 
@@ -385,126 +315,33 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		adb.show();
 	}
 	
-	// ------------------------- Twitter Related Stuff ------------------------
+	// ------------------------- Private Methods ----------------------------
 	
-	protected static final String TWITTER_PREFS = "twitter_preferences";
-	
-	protected static final String TWITTER_OAUTH_CONSUMER_KEY = "twitter_oauth_consumer_key";
-	protected static final String TWITTER_OAUTH_CONSUMER_SECRET = "twitter_oauth_consumer_secret";
-	
-	private static final String TWITTER_OAUTH_VERIFIER = "oauth_verifier";
-	
-	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
-	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
-	
-	protected static final String TWITTER_MESSAGE = "twitter_message";
-	
-	private  SharedPreferences twitterPreferences;
-	
-	private Twitter twitter;
-	private RequestToken twitterOAuthRequestToken;
-	private OAuthAccessToken twitterOAuthConsumerData;
-	private OAuthAccessToken twitterOAuthAccessToken;
-	
-	private RequestToken getTwitterOAuthRequestToken() throws TwitterException {
-		
-		twitter = new TwitterFactory().getInstance();
-		Log.d(TAG, "Token " + twitterOAuthConsumerData.getToken() + " Token Secret " + twitterOAuthConsumerData.getTokenSecret());
-		twitter.setOAuthConsumer(twitterOAuthConsumerData.getToken(), twitterOAuthConsumerData.getTokenSecret()); 
-		
-		String callbackURL = getResources().getString(R.string.twitter_callback); 
-		// This can throw TwitterException if the oauthConsumerData is not correct
-        return twitter.getOAuthRequestToken(callbackURL);
+	private void clearFilterForAllCallsFromService() {
+		incomingCallScanner.filterAllCalls(false);
+		filterAllCB.setChecked(false);
 	}
-		
+	
+	// ------------------------- Twitter Related Stuff ------------------------
+			
 	private void clearTwitterConnectionFromService() {
 			incomingCallScanner.removeCallObserver(Twitterer.INSTANCE);
-			twitterOAuthConsumerData = null;
-			twitterOAuthRequestToken = null;
-			twitterOAuthAccessToken =  null;
-			twitter = null;
 			twitterTB.setChecked(false);
 	}
 	
-	private boolean isTwitterOAuthConsumerDataValid(OAuthAccessToken oauthConsumerData) {
-		return (!oauthConsumerData.getToken().equals("") && !oauthConsumerData.getTokenSecret().equals(""));
-	}
-	
-	private boolean isTwitterOAuthAccessTokenValid(OAuthAccessToken oauthAccessToken) {
-		return (!oauthAccessToken.getToken().equals("") && !oauthAccessToken.getTokenSecret().equals(""));
-	}
-	
-	private OAuthAccessToken loadTwitterOAuthAccessTokenFromAppPreferences() {
-		return new OAuthAccessToken(
-				twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" )
-				,twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ));
-	}
-
-	private void saveTwitterOAuthAccessTokenInAppPreferences(AccessToken accessToken) {
-		twitterPreferences.edit()
-		    .putString(TWITTER_OAUTH_ACCESS_TOKEN, accessToken.getToken())
-		    .putString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, accessToken.getTokenSecret())
-		    .commit();
-		Toast.makeText(this, getResources().getString(R.string.twitter_prefs_saved), Toast.LENGTH_SHORT).show();
-	}
-	
-	private  void launchTwitterWebviewActivity(RequestToken twitterOAuthRequestToken) {
-		Intent i = new Intent(this, TwitterWebviewActivity.class);
-		i.putExtra("URL", twitterOAuthRequestToken.getAuthenticationURL());
-		startActivityForResult(i, GET_TWITTER_ACCESS_TOKEN);
-	}
-
 	private  void launchTwitterConfigurationActivity() {
 		Intent i = new Intent(this, TwitterConfigurationActivity.class);
 		startActivity(i);
 	}
-
-	// ----------------------- To Store Twitter Tokens ------------------------
 	
-	private class OAuthAccessToken {
-		
-		private String token;
-		private String tokenSecret;
-		
-		public OAuthAccessToken(String token, String tokenSecret) {
-			super();
-			this.token = token;
-			this.tokenSecret = tokenSecret;
-		}
-		
-		public String getToken() {
-			return token;
-		}
-		
-		public String getTokenSecret() {
-			return tokenSecret;
-		}
-	}
-	
-	// ---------------------- Mail related stuff ----------------------------
-	
-	protected static final String EMAIL_PREFS = "email_preferences";
-	
-	protected static final String EMAIL = "email_user";
-	protected static final String EMAIL_PASSWORD = "email_password";
-
-	private  SharedPreferences emailPreferences;
+	// ---------------------- Mail related stuff ------------------------------
 	
 	private void launchEmailUserDataActivity() {
 		Intent i = new Intent(this, EmailConfigurationActivity.class);
-		startActivityForResult(i, GET_EMAIL_USER_DATA);
-	}
-
-	private void saveEmailUserDataInAppPreferences(String email, String password) {
-		emailPreferences.edit()
-		    .putString(EMAIL, email)
-		    .putString(EMAIL_PASSWORD, password)
-		    .commit();
-		Toast.makeText(this, getResources().getString(R.string.email_prefs_saved), Toast.LENGTH_LONG).show();
+		startActivity(i);
 	}
 	
 	private void clearEmailConnectionFromService() {
-		//incomingCallScanner.removeCallObserver(Mailer.getInstance());
 		incomingCallScanner.removeCallObserver(Mailer.INSTANCE);
 		emailTB.setChecked(false);
 	}

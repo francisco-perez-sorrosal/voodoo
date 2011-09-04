@@ -20,7 +20,7 @@ import android.widget.Toast;
 
 public class ShowLogActivity extends Activity implements View.OnClickListener {
 
-	private Button btnBack;
+	private Button backB;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -28,8 +28,8 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 		setContentView(R.layout.show_log);
 
 		loadScreen();
-		btnBack = (Button) findViewById(R.id.btnBack);
-		btnBack.setOnClickListener(this);
+		backB = (Button) findViewById(R.id.btnBack);
+		backB.setOnClickListener(this);
 	}
 
 	private void loadScreen() {
@@ -115,4 +115,5 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 		textView.setText(text);
 		return textView;
 	}
+	
 }
