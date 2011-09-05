@@ -3,6 +3,7 @@ package org.acl.root.observers;
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
 import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
 
+import org.acl.root.R;
 import org.acl.root.utils.CallInfo;
 
 import twitter4j.Twitter;
@@ -11,9 +12,9 @@ import twitter4j.TwitterFactory;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
 public enum Twitterer implements CallObserver {
 	
@@ -25,8 +26,8 @@ public enum Twitterer implements CallObserver {
 	// Max length is 120 (and not 140) because the date/time is also inserted
 	private static final int MAX_TWEET_LENGTH = 120;
 	
-	private static final String TWITTER_OAUTH_ACCESS_TOKEN = "twitter_access_token";
-	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
+	private static final String ACCESS_TOKEN = "twitter_access_token";
+	private static final String ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
 	
 	private String defaultTweet = "Sorry, the person you are trying to communicate with is busy";
 	
@@ -46,30 +47,31 @@ public enum Twitterer implements CallObserver {
 	@Override
 	public void callNotification(CallInfo callInfo) {
 		if(twitter == null) {
-			twitter = obtainTwitterInstance(callInfo.getContext());
+			SharedPreferences twitterPreferences = 
+					callInfo.getContext().getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
+			
+			String accessToken =  twitterPreferences.getString(ACCESS_TOKEN, "" );
+			String accessTokenSecret = twitterPreferences.getString(ACCESS_TOKEN_SECRET, "" );
+			
+			if(!accessToken.equals("") && !accessTokenSecret.equals("")) {
+				Configuration conf = new ConfigurationBuilder()
+				.setOAuthConsumerKey(CONSUMER_KEY)
+				.setOAuthConsumerSecret(CONSUMER_SECRET)
+				.setOAuthAccessToken(accessToken)
+				.setOAuthAccessTokenSecret(accessTokenSecret)
+				.build();
+				twitter =  new TwitterFactory(conf).getInstance();
+			}
 		}
 		
 		try {
 			Log.d(TAG, "Sending defaultTweet: " + defaultTweet);
 			twitter.updateStatus(callInfo.getDate() + " " + callInfo.getTime() + " " + defaultTweet);
 			Log.d(TAG, "Tweet sent");
-		} catch (TwitterException e) {
+		} catch (Exception e) { // TwitterException || NullPointerException
 			Log.e(TAG, "Can't send Tweet", e);
+			Toast.makeText(callInfo.getContext(), R.string.tweet_not_sent, Toast.LENGTH_SHORT).show();
 		}	
-	}
-
-	private Twitter obtainTwitterInstance(Context context) {
-		SharedPreferences twitterPreferences = 
-				context.getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
-		
-		Configuration conf = new ConfigurationBuilder()
-		.setOAuthConsumerKey(CONSUMER_KEY)
-		.setOAuthConsumerSecret(CONSUMER_SECRET)
-		.setOAuthAccessToken(twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN, "" ))
-		.setOAuthAccessTokenSecret(twitterPreferences.getString(TWITTER_OAUTH_ACCESS_TOKEN_SECRET, "" ))
-		.build();
- 
-		return new TwitterFactory(conf).getInstance();
 	}
 
 }

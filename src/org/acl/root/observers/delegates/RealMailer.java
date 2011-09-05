@@ -172,6 +172,7 @@ public class RealMailer extends Authenticator {
 					Log.d(TAG, "Email sent.");
 				} else {
 					Log.d(TAG, "Email was not sent.");
+					Toast.makeText(callInfo.getContext(), R.string.email_not_sent, Toast.LENGTH_SHORT).show();
 				}
 			} catch (Exception e) {
 				Log.e(TAG, "Could not send email", e);
