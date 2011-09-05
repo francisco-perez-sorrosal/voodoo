@@ -90,6 +90,7 @@ public class IncomingCallScanner extends Service {
 
 				} else if (state.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 					Log.d(TAG, "Offhook");
+					am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 				}
 			} else if (intent.getAction().equals(
 					"android.intent.action.NEW_OUTGOING_CALL")) {
