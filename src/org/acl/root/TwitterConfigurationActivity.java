@@ -5,6 +5,9 @@ import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
 
 import org.acl.root.observers.Twitterer;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -59,6 +62,9 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.twitter_configuration);
 	    
+	    AdView adView = (AdView)this.findViewById(R.id.adViewTwitter);
+	    adView.loadAd(new AdRequest());
+	    
 		doneB = (Button) findViewById(R.id.twitterConfigurationDoneB);
 		doneB.setOnClickListener(this);
 		clearB = (Button) findViewById(R.id.twitterConfigurationClearB);
@@ -76,6 +82,8 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 			prepareTwitterConnection();
 		}
 		
+		AdRequest addRequest = new AdRequest();
+		addRequest.addTestDevice(AdRequest.TEST_EMULATOR);
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {

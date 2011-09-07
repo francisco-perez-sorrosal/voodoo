@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Call Killer</string>
+    <string name="app_name">VooDoo Call Killer</string>
     <string name="app_description">
-		This application allows to filter temporarily your contacts in a 
-		blacklist and configure different actions on response to incoming calls 
-		(e.g. Tweet a message or email caller.)
+		This application allows to do VooDoo (filter temporarily) the incoming 
+		calls received from your contacts. It also allows to configure different 
+		actions on response to incoming calls (e.g. Tweet a message or send an 
+		email to callers.)
 	</string>
     <string name="app_author">Author: Francisco Pérez-Sorrosal</string>
     <string name="app_author_email">fperezsorrosal (at) gmail.com</string>
@@ -24,22 +25,22 @@
     <string name="no_network">Network connection not available</string>
     
     <!-- Filtering service related strings -->
-    <string name="service_name">Call Scanner</string>
+    <string name="service_name">VooDoo Call Scanner</string>
     <string name="service_name_description">This service is filtering undesired incoming calls!</string>
-    <string name="ics_service_enabled">Filtering Service</string>
+    <string name="ics_service_enabled">Voodoo Service</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
-    <string name="starting_ics_service">Starting Call Scanner</string>
+    <string name="starting_ics_service">Starting Voodoo Call Scanner</string>
     <string name="incoming_call_received">Incoming Call Received</string>
     <string name="show_log">Showing log...</string>
-    <string name="ics_service_started">Call Scanner started</string>
-    <string name="ics_service_not_bound">Call Scanner not bound. Connect first!</string>    
-    <string name="ics_service_stopped">Call Scanner has been stopped</string>
-    <string name="filtered_contacts">Filtered Contacts</string>
+    <string name="ics_service_started">VooDoo Call Scanner started</string>
+    <string name="ics_service_not_bound">VooDoo Call Scanner not bound. Connect first!</string>    
+    <string name="ics_service_stopped">VooDoo Call Scanner has been stopped</string>
+    <string name="filtered_contacts">Doing VooDoo on...</string>
     <string name="no_contact_selected">No contact was selected</string>
     <string name="contact_already_filtered">Contact already filtered</string>
     <string name="missing_contact_data">Some contact data (Name or Phone Number) is missing</string>
-    <string name="filter_all_calls">Filter all incoming calls?</string>
+    <string name="filter_all_calls">Do VooDoo on all calls?</string>
     <string name="call_message_1">Call from </string>
     <string name="call_message_2"> received. Call ended.</string>
 
@@ -61,7 +62,7 @@
     <string name="twitter_enter_consumer_data">Please, put your Twitter user and password</string>
     <string name="twitter_set_right_consumer_data">Please, set properly your Twitter Consumer Key and Secret on the Main Menu</string>
     <string name="twitter_wrong_consumer_data">You must enter your Key and Secret from Twitter</string>
-    <string name="twitter_webview_name">Twitter credentials</string>
+    <string name="twitter_webview_name">Twitter account data</string>
     <string name="twitter_default_msg">Default Tweet to send (Max 120 chars)</string>
     <string name="tweet_not_sent">Your Tweet can\'t be sent :-( Please check your Twitter Preferences</string>
     <string name="twitter_prefs_saved">Twitter OAuth Access Token saved in Preferences</string>

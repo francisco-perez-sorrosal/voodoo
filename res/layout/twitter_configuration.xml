@@ -6,15 +6,15 @@
   android:orientation="vertical"
   android:layout_height="fill_parent" android:layout_width="fill_parent">
     <TextView android:layout_height="wrap_content" android:id="@+id/textView3" android:gravity="center" android:layout_width="fill_parent" android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/twitter_configuration" android:textStyle="bold" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></TextView>
-    <View android:layout_height="2px" android:layout_width="fill_parent" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true"></View>
     <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="fill_parent" android:textAppearance="?android:attr/textAppearanceMedium" android:text="@string/twitter_default_msg" android:layout_below="@+id/view1" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></TextView>
-    <EditText android:layout_height="wrap_content" android:inputType="textMultiLine" android:layout_width="fill_parent" android:width="80dp" android:minLines="5" android:id="@+id/twitterMessage" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true">
+    <EditText android:layout_height="wrap_content" android:inputType="textMultiLine" android:gravity="top" android:layout_width="fill_parent" android:width="80dp" android:minLines="5" android:id="@+id/twitterMessage" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true" android:editable="true">
         <requestFocus></requestFocus>
     </EditText>
-    <View android:layout_height="2px" android:layout_width="fill_parent" android:id="@+id/view2" android:background="@color/separator" android:layout_below="@+id/twitterMessage" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></View>
-    <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/LinearLayout1" android:layout_centerVertical="true" android:layout_alignParentLeft="true">
-        <Button android:layout_height="wrap_content" android:id="@+id/twitterConfigurationDoneB" android:layout_width="wrap_content" android:text="@string/done_tag"></Button>
-        <Button android:layout_height="wrap_content" android:id="@+id/twitterConfigurationClearB" android:layout_width="wrap_content" android:text="@string/clear_tag"></Button>
+    <com.google.ads.AdView ads:adUnitId="MY_AD_UNIT_ID" ads:adSize="IAB_BANNER" ads:loadAdOnCreate="true" android:layout_height="wrap_content" android:id="@+id/adViewTwitter" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></com.google.ads.AdView>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1" android:layout_below="@+id/twitterMessage" android:layout_alignParentLeft="true">
+        <Button android:layout_width="wrap_content" android:id="@+id/twitterConfigurationDoneB" android:text="@string/done_tag" android:layout_height="wrap_content"></Button>
+        <Button android:layout_width="wrap_content" android:id="@+id/twitterConfigurationClearB" android:text="@string/clear_tag" android:layout_height="wrap_content"></Button>
     </LinearLayout>
-    <com.google.ads.AdView ads:adUnitId="MY_AD_UNIT_ID" ads:adSize="IAB_BANNER" ads:loadAdOnCreate="true" android:layout_height="wrap_content" android:id="@+id/adView" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></com.google.ads.AdView>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view2" android:background="@color/separator" android:layout_centerVertical="true" android:layout_alignParentLeft="true"></View>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true"></View>
 </RelativeLayout>
