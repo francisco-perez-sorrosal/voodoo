@@ -1,9 +1,9 @@
-package org.acl.root.observers;
+package com.linkingenius.voodoo.observers;
 
 import javax.mail.PasswordAuthentication;
 
-import org.acl.root.observers.delegates.RealMailer;
-import org.acl.root.utils.CallInfo;
+import com.linkingenius.voodoo.observers.delegates.RealMailer;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 import android.content.Context;
 import android.util.Log;

@@ -1,9 +1,7 @@
-package org.acl.root.utils;
+package com.linkingenius.voodoo.utils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-
-import org.acl.root.R;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -13,6 +11,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.util.Log;
+
+import com.linkingenius.voodoo.R;
 
 /**
  * This class represents a contact in the Android contact list. It implements

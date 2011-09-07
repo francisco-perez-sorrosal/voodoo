@@ -1,4 +1,4 @@
-package org.acl.root.utils;
+package com.linkingenius.voodoo.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

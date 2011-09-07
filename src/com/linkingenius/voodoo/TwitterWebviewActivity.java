@@ -1,4 +1,4 @@
-package org.acl.root;
+package com.linkingenius.voodoo;
 
 import android.app.Activity;
 import android.content.Intent;

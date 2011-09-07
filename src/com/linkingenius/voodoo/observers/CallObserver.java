@@ -1,6 +1,6 @@
-package org.acl.root.observers;
+package com.linkingenius.voodoo.observers;
 
-import org.acl.root.utils.CallInfo;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 public interface CallObserver {
 	/**

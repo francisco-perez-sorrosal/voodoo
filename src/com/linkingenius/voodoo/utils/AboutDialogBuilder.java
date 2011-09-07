@@ -1,6 +1,4 @@
-package org.acl.root.utils;
-
-import org.acl.root.R;
+package com.linkingenius.voodoo.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -10,6 +8,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.text.SpannableString;
 import android.text.util.Linkify;
 import android.widget.TextView;
+
+import com.linkingenius.voodoo.R;
 
 public class AboutDialogBuilder {
 	public static AlertDialog create( Context context ) throws NameNotFoundException {

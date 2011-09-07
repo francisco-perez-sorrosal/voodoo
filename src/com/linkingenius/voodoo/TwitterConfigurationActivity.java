@@ -1,13 +1,7 @@
-package org.acl.root;
+package com.linkingenius.voodoo;
 
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
-
-import org.acl.root.observers.Twitterer;
-
-import com.google.ads.AdRequest;
-import com.google.ads.AdView;
-
+import static com.linkingenius.voodoo.TwitterOAuthConstants.CONSUMER_KEY;
+import static com.linkingenius.voodoo.TwitterOAuthConstants.CONSUMER_SECRET;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -23,6 +17,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
+import com.linkingenius.voodoo.observers.Twitterer;
 
 /**
  * Activity to capture the Twitter OAuth Consumer Data and other related stuff

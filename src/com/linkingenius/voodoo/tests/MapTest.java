@@ -1,12 +1,13 @@
-package org.acl.root.tests;
+package com.linkingenius.voodoo.tests;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import junit.framework.TestCase;
 
-import org.acl.root.core.InstrumentedConcurrentMap;
 import org.junit.Test;
+
+import com.linkingenius.voodoo.core.InstrumentedConcurrentMap;
 
 public class MapTest extends TestCase {
 

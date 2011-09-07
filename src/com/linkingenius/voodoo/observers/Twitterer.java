@@ -1,13 +1,8 @@
-package org.acl.root.observers;
+package com.linkingenius.voodoo.observers;
 
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_KEY;
-import static org.acl.root.TwitterOAuthConstants.CONSUMER_SECRET;
-
-import org.acl.root.R;
-import org.acl.root.utils.CallInfo;
-
+import static com.linkingenius.voodoo.TwitterOAuthConstants.CONSUMER_KEY;
+import static com.linkingenius.voodoo.TwitterOAuthConstants.CONSUMER_SECRET;
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
@@ -15,6 +10,9 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.linkingenius.voodoo.R;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 public enum Twitterer implements CallObserver {
 	

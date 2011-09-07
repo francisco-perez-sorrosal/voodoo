@@ -1,14 +1,6 @@
-package org.acl.root;
+package com.linkingenius.voodoo;
 
 import java.util.ArrayList;
-
-import org.acl.root.core.BlackList;
-import org.acl.root.observers.Mailer;
-import org.acl.root.observers.Twitterer;
-import org.acl.root.observers.UserNotifier;
-import org.acl.root.utils.AboutDialogBuilder;
-import org.acl.root.utils.Contact;
-import org.acl.root.utils.Tools;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,6 +33,13 @@ import android.widget.ToggleButton;
 
 import com.google.ads.AdRequest;
 import com.google.ads.AdView;
+import com.linkingenius.voodoo.core.BlackList;
+import com.linkingenius.voodoo.observers.Mailer;
+import com.linkingenius.voodoo.observers.Twitterer;
+import com.linkingenius.voodoo.observers.UserNotifier;
+import com.linkingenius.voodoo.utils.AboutDialogBuilder;
+import com.linkingenius.voodoo.utils.Contact;
+import com.linkingenius.voodoo.utils.Tools;
 
 /**
  * Main activity for my blacklist application. Contains the start/stop button 

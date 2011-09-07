@@ -1,4 +1,4 @@
-package org.acl.root.core;
+package com.linkingenius.voodoo.core;
 
 import java.util.Collection;
 import java.util.Map;

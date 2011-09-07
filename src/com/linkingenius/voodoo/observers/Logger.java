@@ -1,4 +1,4 @@
-package org.acl.root.observers;
+package com.linkingenius.voodoo.observers;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.acl.root.utils.CallInfo;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 import android.content.Context;
 import android.util.Log;

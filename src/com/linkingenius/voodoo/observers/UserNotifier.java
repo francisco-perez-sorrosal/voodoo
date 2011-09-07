@@ -1,8 +1,4 @@
-package org.acl.root.observers;
-
-import org.acl.root.MainActivity;
-import org.acl.root.R;
-import org.acl.root.utils.CallInfo;
+package com.linkingenius.voodoo.observers;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -16,6 +12,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.linkingenius.voodoo.MainActivity;
+import com.linkingenius.voodoo.R;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 public enum UserNotifier implements CallObserver {
 

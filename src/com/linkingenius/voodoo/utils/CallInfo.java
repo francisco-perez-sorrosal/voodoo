@@ -1,4 +1,4 @@
-package org.acl.root.utils;
+package com.linkingenius.voodoo.utils;
 
 import java.io.Serializable;
 import java.text.Format;

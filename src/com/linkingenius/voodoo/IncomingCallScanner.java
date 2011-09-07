@@ -1,15 +1,8 @@
-package org.acl.root;
+package com.linkingenius.voodoo;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.acl.root.core.BlackList;
-import org.acl.root.observers.CallObserver;
-import org.acl.root.observers.Logger;
-import org.acl.root.observers.UserNotifier;
-import org.acl.root.utils.CallInfo;
-import org.acl.root.utils.Contact;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -22,6 +15,13 @@ import android.os.IBinder;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.linkingenius.voodoo.core.BlackList;
+import com.linkingenius.voodoo.observers.CallObserver;
+import com.linkingenius.voodoo.observers.Logger;
+import com.linkingenius.voodoo.observers.UserNotifier;
+import com.linkingenius.voodoo.utils.CallInfo;
+import com.linkingenius.voodoo.utils.Contact;
 
 /**
  * This is the service responsible of capturing incoming calls and 

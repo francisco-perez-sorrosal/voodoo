@@ -1,9 +1,6 @@
-package org.acl.root;
+package com.linkingenius.voodoo;
 
 import java.util.List;
-
-import org.acl.root.observers.Logger;
-import org.acl.root.utils.CallInfo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,6 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.linkingenius.voodoo.observers.Logger;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 public class ShowLogActivity extends Activity implements View.OnClickListener {
 

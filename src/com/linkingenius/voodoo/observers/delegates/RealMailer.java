@@ -1,4 +1,4 @@
-package org.acl.root.observers.delegates;
+package com.linkingenius.voodoo.observers.delegates;
 
 import java.util.Date;
 import java.util.List;
@@ -20,14 +20,14 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.acl.root.R;
-import org.acl.root.utils.CallInfo;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.linkingenius.voodoo.R;
+import com.linkingenius.voodoo.utils.CallInfo;
 
 public class RealMailer extends Authenticator {
 

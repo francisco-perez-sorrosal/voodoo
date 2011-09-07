@@ -26,4 +26,4 @@ local.properties
 # Specific files from application
 
 # This contains the Twitter OAuth Consumer Key and Secret
-/src/org/acl/root/TwitterOAuthConstants.java
+/src/com/linkingenius/voodoo/TwitterOAuthConstants.java
