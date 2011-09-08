@@ -60,8 +60,11 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.twitter_configuration);
 	    
-	    AdView adView = (AdView)this.findViewById(R.id.adViewTwitter);
-	    adView.loadAd(new AdRequest());
+	    AdView adView = (AdView)this.findViewById(R.id.adView);
+	    AdRequest request = new AdRequest();
+	    request.addTestDevice(AdRequest.TEST_EMULATOR);
+	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+	    adView.loadAd(request);
 	    
 		doneB = (Button) findViewById(R.id.twitterConfigurationDoneB);
 		doneB.setOnClickListener(this);
@@ -80,8 +83,6 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 			prepareTwitterConnection();
 		}
 		
-		AdRequest addRequest = new AdRequest();
-		addRequest.addTestDevice(AdRequest.TEST_EMULATOR);
 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {

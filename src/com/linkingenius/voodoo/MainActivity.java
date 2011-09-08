@@ -99,7 +99,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		setContentView(R.layout.main);
 		
 		AdView adView = (AdView)this.findViewById(R.id.adView);
-	    adView.loadAd(new AdRequest());
+	    AdRequest request = new AdRequest();
+	    request.addTestDevice(AdRequest.TEST_EMULATOR);
+	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+	    adView.loadAd(request);
 		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
@@ -119,9 +122,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
 				IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
-		
-		AdRequest addRequest = new AdRequest();
-		addRequest.addTestDevice(AdRequest.TEST_EMULATOR);
 		
 		Log.d(TAG, "onCreate");
 	}

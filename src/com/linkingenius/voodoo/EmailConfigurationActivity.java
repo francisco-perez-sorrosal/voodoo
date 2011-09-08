@@ -1,5 +1,8 @@
 package com.linkingenius.voodoo;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -30,7 +33,13 @@ public class EmailConfigurationActivity extends Activity implements OnClickListe
 	
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
-	    setContentView(R.layout.email_user_data);
+	    setContentView(R.layout.email_configuration);
+	    
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+	    AdRequest request = new AdRequest();
+	    request.addTestDevice(AdRequest.TEST_EMULATOR);
+	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+	    adView.loadAd(request);
 	    
 	    emailPreferences = getSharedPreferences(EMAIL_PREFS, Activity.MODE_PRIVATE);
 	    email = (EditText) findViewById(R.id.emailT);

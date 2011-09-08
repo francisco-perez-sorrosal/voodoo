@@ -15,6 +15,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdView;
 import com.linkingenius.voodoo.observers.Logger;
 import com.linkingenius.voodoo.utils.CallInfo;
 
@@ -27,6 +29,12 @@ public class ShowLogActivity extends Activity implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.show_log);
 
+		AdView adView = (AdView)this.findViewById(R.id.adView);
+	    AdRequest request = new AdRequest();
+	    request.addTestDevice(AdRequest.TEST_EMULATOR);
+	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
+	    adView.loadAd(request);
+	    
 		loadScreen();
 		backB = (Button) findViewById(R.id.btnBack);
 		backB.setOnClickListener(this);

@@ -5,16 +5,16 @@
   android:background="@color/background"
   android:orientation="vertical"
   android:layout_height="fill_parent" android:layout_width="fill_parent">
-    <TextView android:layout_height="wrap_content" android:id="@+id/textView3" android:gravity="center" android:layout_width="fill_parent" android:textAppearance="?android:attr/textAppearanceLarge" android:text="@string/twitter_configuration" android:textStyle="bold" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"></TextView>
-    <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:layout_width="fill_parent" android:textAppearance="?android:attr/textAppearanceMedium" android:text="@string/twitter_default_msg" android:layout_below="@+id/view1" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></TextView>
-    <EditText android:layout_height="wrap_content" android:inputType="textMultiLine" android:gravity="top" android:layout_width="fill_parent" android:width="80dp" android:minLines="5" android:id="@+id/twitterMessage" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true" android:editable="true">
+	<com.google.ads.AdView ads:adUnitId="a14e67a128c0a6e" ads:adSize="BANNER" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/adView"></com.google.ads.AdView>
+    <TextView android:layout_width="fill_parent" android:id="@+id/textView1" android:text="@string/twitter_default_msg" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/view1" android:layout_alignParentLeft="true" android:layout_marginTop="18dp" android:layout_marginLeft="5dp"></TextView>
+    <EditText android:layout_width="fill_parent" android:gravity="top" android:editable="true" android:layout_height="wrap_content" android:inputType="textMultiLine" android:width="80dp" android:id="@+id/twitterMessage" android:minLines="5" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true" android:layout_marginTop="23dp">
         <requestFocus></requestFocus>
     </EditText>
-    <com.google.ads.AdView ads:adUnitId="MY_AD_UNIT_ID" ads:adSize="IAB_BANNER" ads:loadAdOnCreate="true" android:layout_height="wrap_content" android:id="@+id/adViewTwitter" android:layout_width="fill_parent" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></com.google.ads.AdView>
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1" android:layout_below="@+id/twitterMessage" android:layout_alignParentLeft="true">
-        <Button android:layout_width="wrap_content" android:id="@+id/twitterConfigurationDoneB" android:text="@string/done_tag" android:layout_height="wrap_content"></Button>
-        <Button android:layout_width="wrap_content" android:id="@+id/twitterConfigurationClearB" android:text="@string/clear_tag" android:layout_height="wrap_content"></Button>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view2" android:background="@color/separator" android:layout_below="@+id/twitterMessage" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></View>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true" android:layout_marginTop="16dp"></View>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1" android:layout_below="@+id/view2" android:layout_alignParentLeft="true" android:layout_marginTop="18dp">
+        <Button android:id="@+id/twitterConfigurationDoneB" android:text="@string/done_tag" android:layout_height="wrap_content" android:layout_width="100dp"></Button>
+        <Button android:id="@+id/twitterConfigurationClearB" android:text="@string/clear_tag" android:layout_height="wrap_content" android:layout_width="100dp"></Button>
     </LinearLayout>
-    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view2" android:background="@color/separator" android:layout_centerVertical="true" android:layout_alignParentLeft="true"></View>
-    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true"></View>
+    <TextView android:textStyle="bold" android:layout_width="fill_parent" android:gravity="center" android:id="@+id/textView3" android:text="@string/twitter_configuration" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_below="@+id/adView" android:layout_alignParentLeft="true"></TextView>
 </RelativeLayout>

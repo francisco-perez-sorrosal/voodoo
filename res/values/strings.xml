@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">VooDoo Call Killer</string>
     <string name="app_description">
-		This application allows to do VooDoo (filter temporarily) the incoming 
+		This application allows to do VooDoo (filter temporarily) on the incoming 
 		calls received from your contacts. It also allows to configure different 
 		actions on response to incoming calls (e.g. Tweet a message or send an 
 		email to callers.)

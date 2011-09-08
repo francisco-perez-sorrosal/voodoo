@@ -1,2 +1,37 @@
-Reference to block incoming calls in Android: http://hive-mind.org/2011/04/12/android-call-blocking/
-Reference to send email in Android: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
+oOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOo
+OoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooO
+oOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOo
+OoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooO
+oOOOoooooO
+OoooOOO
+ooooO            VooDoo Call Killer
+oooo
+oooo        (C) Francisco Perez-Sorrosal
+ooooO
+OoooOOO
+oOOOoooooO
+OoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooO
+oOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOo
+OoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooOOOOOoooO
+oOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOoooooOOOo
+
+----------
+Objectives
+----------
+
+This application allows to do VooDoo (filter temporarily) on the incoming calls
+received from your contacts. It also allows to configure different actions on 
+response to incoming calls (e.g. Tweet a message or send an email to callers.)
+This is useful when you are in a meeting, interview or simply when you do not 
+want to be interrupted.
+
+--------
+Versions
+--------
+
+v1.1 (9/8/2011) - UI improved
+v1.0 (9/7/2011) - First Version
+
+Any comment to improve the application is welcome! Please contact me at:
+
+             ***** fperezsorrosal (at) gmail.com *****

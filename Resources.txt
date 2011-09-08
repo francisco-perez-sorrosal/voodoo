@@ -1,0 +1,11 @@
+Useful Resources
+----------------
+
+- Current icons are done with: http://android-ui-utils.googlecode.com/hg/asset-studio/dist/index.html
+- Other tool that seems to be interesting regarding icons: http://www.androidicongenerator.net/
+
+- To generate short URLs: http://tiny.cc/
+- Search for images: http://search.creativecommons.org/
+
+- Reference to block incoming calls in Android: http://hive-mind.org/2011/04/12/android-call-blocking/
+- Reference to send email in Android: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app

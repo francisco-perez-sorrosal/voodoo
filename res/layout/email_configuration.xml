@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
+  android:background="@color/background"
+  android:orientation="vertical"
+  android:layout_width="fill_parent" android:weightSum="1" android:layout_height="fill_parent">
+    <com.google.ads.AdView ads:adUnitId="a14e67a128c0a6e" ads:adSize="BANNER" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/adView"></com.google.ads.AdView>
+    <TextView android:textStyle="bold" android:layout_width="fill_parent" android:gravity="center" android:id="@+id/textView3" android:text="@string/email_name" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_below="@+id/adView" android:layout_alignParentLeft="true"></TextView>
+    <TextView android:layout_width="fill_parent" android:id="@+id/textView1" android:text="@string/email" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/view1" android:layout_alignParentLeft="true" android:layout_marginTop="19dp" android:textSize="22sp" android:layout_marginLeft="5dp"></TextView>
+    <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/emailT" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true">
+        <requestFocus></requestFocus>
+    </EditText>
+    <TextView android:layout_width="fill_parent" android:id="@+id/textView2" android:text="@string/password" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_below="@+id/emailT" android:layout_alignParentLeft="true" android:layout_marginTop="14dp" android:textSize="22sp" android:layout_marginLeft="5dp"></TextView>
+    <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:inputType="textPassword" android:id="@+id/emailPasswordT" android:layout_below="@+id/textView2" android:layout_alignParentLeft="true"></EditText>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view2" android:background="@color/separator" android:layout_below="@+id/emailPasswordT" android:layout_alignParentLeft="true" android:layout_marginTop="17dp"></View>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/LinearLayout1" android:layout_below="@+id/view2" android:layout_alignParentLeft="true" android:layout_marginTop="16dp">
+        <Button android:id="@+id/emailDoneB" android:text="@string/done_tag" android:layout_height="wrap_content" android:layout_width="100dp"></Button>
+        <Button android:id="@+id/emailClearB" android:text="@string/clear_tag" android:layout_height="wrap_content" android:layout_width="100dp"></Button>
+    </LinearLayout>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></View>
+</RelativeLayout>
