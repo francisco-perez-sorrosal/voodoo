@@ -43,7 +43,7 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 	private static final String TWITTER_OAUTH_ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
 	
 	private static final String TWITTER_MESSAGE = "twitter_message";
-	private static final String DEFAULT_TWITTER_MESSAGE = "Sorry, the person you are trying to communicate with is busy";
+	private static final String DEFAULT_TWITTER_MESSAGE = "Sorry, I'm busy now! Twitted with #VooDooCallKiller. Find me in Android Market: http://tiny.cc/voodoocallkiller";
 	
 	private EditText twitterMessage;
 	private Button doneB;
@@ -73,7 +73,7 @@ public class TwitterConfigurationActivity extends Activity implements OnClickLis
 		
 	    twitterPreferences = getSharedPreferences(TWITTER_PREFS, Activity.MODE_PRIVATE);
 	    twitterMessage = (EditText) findViewById(R.id.twitterMessage);
-	    twitterMessage.setText(twitterPreferences.getString(TWITTER_MESSAGE, ""));
+	    twitterMessage.setText(twitterPreferences.getString(TWITTER_MESSAGE, DEFAULT_TWITTER_MESSAGE));
 	    
 	    twitterOAuthConsumerData = new OAuthAccessToken(CONSUMER_KEY, CONSUMER_SECRET); 
 		twitterOAuthAccessToken = loadTwitterOAuthAccessTokenFromAppPreferences();

@@ -27,7 +27,7 @@ public enum Twitterer implements CallObserver {
 	private static final String ACCESS_TOKEN = "twitter_access_token";
 	private static final String ACCESS_TOKEN_SECRET = "twitter_access_token_secret";
 	
-	private String defaultTweet = "Sorry, the person you are trying to communicate with is busy";
+	private String defaultTweet = "Sorry, I'm busy now! Twitted with #VooDooCallKiller. Find me in Android Market: http://tiny.cc/voodoocallkiller";
 	
 	private Twitter twitter = null;
 			

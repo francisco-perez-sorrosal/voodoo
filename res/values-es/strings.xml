@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VooDoo Call Killer</string>
+    <string name="app_description">
+		Esta aplicación te permite hacer VooDoo (filtrar temporalmente) las
+		llamadas entrantes recibidas. Permite también configurar diferentes
+		acciones en respuesta a dichas llamadas (p.ej. Twittear un mensaje 
+		o enviar un email a quien haya llamado.)\n\nIconos del menú por 
+		Joseph Wain / glyphish.com
+	</string>
+    <string name="app_author">Autor: Francisco Pérez-Sorrosal
+    \nhttp://linkedin.com/in/fperezsorrosal</string>
+    <string name="app_author_email">fperezsorrosal (at) gmail.com</string>
+	
+    <!-- General messages -->
+    <string name="version">Version %s</string>
+    <string name="about">Sobre %s</string>
+    <string name="unknown_contact">Contacto desconocido</string>
+    <string name="delete_op">Oeración de borrado</string>
+    <string name="ok_tag">Si</string>
+    <string name="cancel_tag">No</string>
+    <string name="on_tag">On</string>
+    <string name="off_tag">Off</string>
+    <string name="done_tag">Aceptar</string>
+    <string name="clear_tag">Limpiar</string>
+    <string name="close_tag">Cerrar</string>
+    <string name="email">E-mail del usuario</string>
+    <string name="password">Password</string>
+    <string name="no_network">Conexión de red no disponible</string>
+    
+    <!-- Filtering service related strings -->
+    <string name="service_name">VooDoo Call Scanner</string>
+    <string name="service_name_description">¡Este servicio está filtrando llamadas no deseadas!</string>
+    <string name="ics_service_enabled">Servicio de VooDoo</string>
+    <string name="started">Iniciado</string>
+    <string name="stopped">Detenido</string>
+    <string name="starting_ics_service">Iniciando Voodoo Call Scanner</string>
+    <string name="incoming_call_received">Llamada entrante recibida</string>
+    <string name="show_log">Mostrando log...</string>
+    <string name="ics_service_started">VooDoo Call Scanner iniciado</string>
+    <string name="ics_service_not_bound">VooDoo Call Scanner todavía no iniciado. Pulsa el botón...</string>    
+    <string name="ics_service_stopped">VooDoo Call Scanner detenido</string>
+    <string name="filtered_contacts">Haciendo VooDoo a...</string>
+    <string name="no_contact_selected">No se ha seleccionado ningún contacto</string>
+    <string name="contact_already_filtered">El contacto ya está filtrado</string>
+    <string name="missing_contact_data">Faltan datos críticos del contacto (Nombre y/o Teléfono)</string>
+    <string name="filter_all_calls">¿VooDoo a todo el mundo?</string>
+    <string name="call_message_1">Llamada de </string>
+    <string name="call_message_2"> recibida. Llamada finalizada.</string>
+
+    <!-- Email related strings -->    
+    <string name="email_enabled">Enviar e-mail?</string>
+    <string name="email_name">Configuración de GMail</string>
+    <string name="email_wrong_user_data">Debes introducir tu usuario y password de GMail</string>
+    <string name="no_email_addresses_found">No se encontraron direcciones de e-mail de destino</string>
+    <string name="email_prefs_saved">Datos de usuario de e-mail guardados</string>
+    <string name="email_not_sent">El e-mail no se ha podido enviar :-( Por favor, comprueba si tus datos son correctos</string>
+    
+    <!-- Twitter related strings -->
+    <string name="twitter_enabled">Tweetear?</string>
+    <string name="twitter_callback">twitter-callback:///</string>
+    <string name="twitter_configuration">Configuración de Twitter</string>
+    <string name="twitter_conn_allowed">Ya puedes conectar el Twitteo. Pulsa el botón...</string>
+    <string name="twitter_at_error">Error obteniendo el Token de Acceso de Twitter</string>
+    <string name="twitter_auth_failed">La autorización de Twitter ha fallado</string>
+    <string name="twitter_enter_consumer_data">Por favor, introduce tu usuario y password de Twitter</string>
+    <string name="twitter_set_right_consumer_data">Por favor, comprueba tu Consumer Key y Secret de Twitter en el menú principal</string>
+    <string name="twitter_wrong_consumer_data">Debes poner tu Key y Secret de Twitter</string>
+    <string name="twitter_webview_name">Configuración de Twitter</string>
+    <string name="twitter_default_msg">Tweet defecto (Max 120 caract.)</string>
+    <string name="tweet_not_sent">Tu Tweet no se ha podido enviar :-( Por favor, comprueba si tus datos son correctos</string>
+    <string name="twitter_prefs_saved">Twitter OAuth Access Token guardado</string>
+
+	<!-- Call log related strings -->
+	<string name="call_log">Log de Llamadas</string>
+    <string name="log_label">Llamadas recibidas</string>
+    <string name="clear_log">Limpiar Log</string>
+    <string name="caller_log_tag">Llamada de: </string>
+    <string name="phone_log_tag">Tlfn.: </string>
+    <string name="date_log_tag">Fecha: </string>
+    <string name="hour_log_tag">Hora: </string>
+    <string name="confirm_clear_log_msg">¿Estás seguro de que quieres borrar el log?</string>
+    <string name="log_empty_msg">No se han recibido llamadas todavía</string>
+</resources>

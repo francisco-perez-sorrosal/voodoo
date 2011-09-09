@@ -32,9 +32,11 @@ import com.linkingenius.voodoo.utils.CallInfo;
 public class RealMailer extends Authenticator {
 
 	private static final String TAG = "RealMailer";
-	private static final String DEFAULT_FROM_EMAIL = "no-reply@linkingenius.com";
-	private static final String DEFAULT_SUBJECT = "Autoresponse from Blacklist Android App";
-
+	
+	private static final String DEFAULT_FROM_EMAIL = "voodoocallkiller.no-reply@linkingenius.com";
+	private static final String DEFAULT_SUBJECT = "Autoresponse from VooDoo Call Killer App";
+	private static final String DEFAULT_BODY = "The person you are trying to communicate is busy at this time. Please call him late. Sent with #VooDooCallKiller. Find me in Android Market: http://tiny.cc/voodoocallkiller";
+	
 	protected static final String EMAIL_PREFS = "email_preferences";
 	
 	protected static final String EMAIL = "email_user";
@@ -125,6 +127,7 @@ public class RealMailer extends Authenticator {
 			// setup message body
 			BodyPart messageBodyPart = new MimeBodyPart();
 			messageBodyPart.setText(body);
+			multipart = new MimeMultipart();
 			multipart.addBodyPart(messageBodyPart);
 
 			// Put parts in message
@@ -166,7 +169,7 @@ public class RealMailer extends Authenticator {
 			setTo(toArr);
 			setFrom(DEFAULT_FROM_EMAIL);
 			setSubject(DEFAULT_SUBJECT);
-			setBody("Francisco is busy at this time. Please call him late.");
+			setBody(DEFAULT_BODY);
 			try {
 				if (send(callInfo.getContext())) {
 					Log.d(TAG, "Email sent.");

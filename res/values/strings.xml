@@ -5,9 +5,10 @@
 		This application allows to do VooDoo (filter temporarily) on the incoming 
 		calls received from your contacts. It also allows to configure different 
 		actions on response to incoming calls (e.g. Tweet a message or send an 
-		email to callers.)
+		email to callers.)\n\nMenu icons by Joseph Wain / glyphish.com
 	</string>
-    <string name="app_author">Author: Francisco Pérez-Sorrosal</string>
+    <string name="app_author">Author: Francisco Pérez-Sorrosal
+    \nhttp://linkedin.com/in/fperezsorrosal</string>
     <string name="app_author_email">fperezsorrosal (at) gmail.com</string>
 	
     <!-- General messages -->
@@ -17,6 +18,8 @@
     <string name="delete_op">Delete operation</string>
     <string name="ok_tag">Yes</string>
     <string name="cancel_tag">No</string>
+    <string name="on_tag">On</string>
+    <string name="off_tag">Off</string>
     <string name="done_tag">Done</string>
     <string name="clear_tag">Clear</string>
     <string name="close_tag">Close</string>
