@@ -68,20 +68,18 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
 			Log.d(TAG, "Observers " + incomingCallScanner.nofObservers());
-			if(incomingCallScanner != null) {
-				startStopTB.setChecked(true);
-				filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
-						R.layout.contact_list_item, BlackList.INSTANCE.toArrayList());
-				filteredContactsLV.setAdapter(filteredContactsAdapter);
-				filteredContactsAdapter.notifyDataSetChanged();
-				filteredContactsLV.refreshDrawableState();
-				if(incomingCallScanner.isAllCallsFilterEnabled())
-					filterAllCB.setChecked(true);
-				if(incomingCallScanner.containsObserver(Mailer.INSTANCE))
-					emailTB.setChecked(true);
-				if(incomingCallScanner.containsObserver(Twitterer.INSTANCE))
-					twitterTB.setChecked(true);
-			}
+			startStopTB.setChecked(true);
+//			filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
+//					R.layout.contact_list_item, BlackList.INSTANCE.toArrayList());
+//			filteredContactsLV.setAdapter(filteredContactsAdapter);
+//			filteredContactsAdapter.notifyDataSetChanged();
+//			filteredContactsLV.refreshDrawableState();
+			if(incomingCallScanner.isAllCallsFilterEnabled())
+				filterAllCB.setChecked(true);
+			if(incomingCallScanner.containsObserver(Mailer.INSTANCE))
+				emailTB.setChecked(true);
+			if(incomingCallScanner.containsObserver(Twitterer.INSTANCE))
+				twitterTB.setChecked(true);
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -103,6 +101,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	    request.addTestDevice(AdRequest.TEST_EMULATOR);
 	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
 	    adView.loadAd(request);
+	    
+	    //BlackList.INSTANCE.loadFromFile(getApplicationContext());
 		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
@@ -118,6 +118,12 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 
 		filteredContactsLV = (ListView) findViewById(R.id.filteredContactsLV);
 		filteredContactsLV.setOnItemClickListener(this);
+		// Load the contact ListView
+		filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
+				R.layout.contact_list_item, BlackList.INSTANCE.toArrayList(getApplicationContext()));
+		filteredContactsLV.setAdapter(filteredContactsAdapter);
+		filteredContactsAdapter.notifyDataSetChanged();
+		filteredContactsLV.refreshDrawableState();
 
 		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
@@ -132,6 +138,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		// Don't call clearTwitter/MailConnection() on destroying this activity
 		// cause, if enabled, messages must be sent!!!
 		unbindService(mConnection);
+		//BlackList.INSTANCE.saveToFile(getApplicationContext());
 		Log.d(TAG, "onDestroy");
 	}
 
@@ -159,18 +166,18 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.contacts:			
-			if(incomingCallScanner != null) {
+			//if(incomingCallScanner != null) {
 				Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
 				startActivityForResult(intentContact, PICK_CONTACT);
-			} else {
-				Toast.makeText(this, getResources().getString(R.string.ics_service_not_bound), Toast.LENGTH_SHORT).show();
-			}
+			//} else {
+			//	Toast.makeText(this, getResources().getString(R.string.ics_service_not_bound), Toast.LENGTH_SHORT).show();
+			//}
 			break;
 		case R.id.twitter:
 			launchTwitterConfigurationActivity();
 			break;
 		case R.id.logs:
-			if(incomingCallScanner != null)
+			//if(incomingCallScanner != null)
 				UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
 						UserNotifier.CallScannerNotification.SHOW_LOG);
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
@@ -204,7 +211,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				// Your class variables now have the data, so do something with it
 				String name = contact.getName();
 				if(name !=null & !contact.getPhoneNumbers().isEmpty()) {
-					Contact previousContact = BlackList.INSTANCE.addContact(contact);
+					Contact previousContact = BlackList.INSTANCE.addContact(getApplicationContext(), contact);
 					if(previousContact == null) { // To avoid duplicates
 						filteredContactsAdapter.add(contact);
 						filteredContactsAdapter.notifyDataSetChanged();
@@ -242,9 +249,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				clearEmailConnectionFromService();
 				clearTwitterConnectionFromService();
 				stopService(new Intent(this, IncomingCallScanner.class));
-				filteredContactsAdapter.clear();
-				filteredContactsAdapter.notifyDataSetChanged();
-				filteredContactsLV.refreshDrawableState();
+				//filteredContactsAdapter.clear();
+				//filteredContactsAdapter.notifyDataSetChanged();
+				//filteredContactsLV.refreshDrawableState();
 				Log.d(TAG, "onClick: service stopped");
 			}
 			break;
@@ -308,7 +315,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		adb.setMessage("Are you sure you want to delete " + contact.getName());
 		adb.setPositiveButton(getResources().getString(R.string.ok_tag), new AlertDialog.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
-				BlackList.INSTANCE.removeContact(contact);
+				BlackList.INSTANCE.removeContact(getApplicationContext(), contact);
 				filteredContactsAdapter.remove(contact);
 				filteredContactsAdapter.notifyDataSetChanged();
 				filteredContactsLV.refreshDrawableState();
