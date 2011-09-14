@@ -69,11 +69,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
 			Log.d(TAG, "Observers " + incomingCallScanner.nofObservers());
 			startStopTB.setChecked(true);
-//			filteredContactsAdapter = new DualLineArrayAdapter(getApplicationContext(),
-//					R.layout.contact_list_item, BlackList.INSTANCE.toArrayList());
-//			filteredContactsLV.setAdapter(filteredContactsAdapter);
-//			filteredContactsAdapter.notifyDataSetChanged();
-//			filteredContactsLV.refreshDrawableState();
 			if(incomingCallScanner.isAllCallsFilterEnabled())
 				filterAllCB.setChecked(true);
 			if(incomingCallScanner.containsObserver(Mailer.INSTANCE))
@@ -102,8 +97,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
 	    adView.loadAd(request);
 	    
-	    //BlackList.INSTANCE.loadFromFile(getApplicationContext());
-		
 		startStopTB = (ToggleButton) findViewById(R.id.startStopTB);
 		startStopTB.setOnClickListener(this);
 		
@@ -138,7 +131,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		// Don't call clearTwitter/MailConnection() on destroying this activity
 		// cause, if enabled, messages must be sent!!!
 		unbindService(mConnection);
-		//BlackList.INSTANCE.saveToFile(getApplicationContext());
 		Log.d(TAG, "onDestroy");
 	}
 
@@ -146,12 +138,14 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	protected void onPause() {
 		super.onPause();
 		Log.d(TAG, "onPause");
+		BlackList.INSTANCE.stopAutosaving(getApplicationContext());
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d(TAG, "onResume");
+		BlackList.INSTANCE.startAutosaving(getApplicationContext());
 	}
 
 	// ----------------------- END Lifecycle ------------------------
@@ -166,20 +160,15 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.contacts:			
-			//if(incomingCallScanner != null) {
-				Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
-				startActivityForResult(intentContact, PICK_CONTACT);
-			//} else {
-			//	Toast.makeText(this, getResources().getString(R.string.ics_service_not_bound), Toast.LENGTH_SHORT).show();
-			//}
+			Intent intentContact = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI); 
+			startActivityForResult(intentContact, PICK_CONTACT);
 			break;
 		case R.id.twitter:
 			launchTwitterConfigurationActivity();
 			break;
 		case R.id.logs:
-			//if(incomingCallScanner != null)
-				UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
-						UserNotifier.CallScannerNotification.SHOW_LOG);
+			UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
+					UserNotifier.CallScannerNotification.SHOW_LOG);
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);
 			break;
@@ -249,9 +238,6 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 				clearEmailConnectionFromService();
 				clearTwitterConnectionFromService();
 				stopService(new Intent(this, IncomingCallScanner.class));
-				//filteredContactsAdapter.clear();
-				//filteredContactsAdapter.notifyDataSetChanged();
-				//filteredContactsLV.refreshDrawableState();
 				Log.d(TAG, "onClick: service stopped");
 			}
 			break;
