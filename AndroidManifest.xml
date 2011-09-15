@@ -28,8 +28,10 @@
 		</activity>
 		<service android:enabled="true" android:name=".IncomingCallScanner" />
 		<activity android:name=".ShowLogActivity" />
-		<activity android:name=".EmailConfigurationActivity" />
-		<activity android:name=".TwitterConfigurationActivity" />
+		<activity android:name=".EmailConfigurationActivity"
+			android:windowSoftInputMode="adjustPan" />
+		<activity android:name=".TwitterConfigurationActivity" 
+			android:windowSoftInputMode="adjustPan"/>
 		<activity android:name=".TwitterWebviewActivity" />
 		<!-- Google Ads Activity -->
 		<activity android:name="com.google.ads.AdActivity"

@@ -23,7 +23,7 @@
     <string name="done_tag">Done</string>
     <string name="clear_tag">Clear</string>
     <string name="close_tag">Close</string>
-    <string name="email">User e-mail</string>
+    <string name="email">GMail User</string>
     <string name="password">Password</string>
     <string name="no_network">Network connection not available</string>
     
@@ -50,6 +50,7 @@
     <!-- Email related strings -->    
     <string name="email_enabled">E-mail caller?</string>
     <string name="email_name">GMail User Data</string>
+    <string name="email_default_msg">Text to send</string>
     <string name="email_wrong_user_data">You must enter your GMail user and password</string>
     <string name="no_email_addresses_found">No email addresses found</string>
     <string name="email_prefs_saved">Email user data saved in Preferences</string>
@@ -66,7 +67,7 @@
     <string name="twitter_set_right_consumer_data">Please, set properly your Twitter Consumer Key and Secret on the Main Menu</string>
     <string name="twitter_wrong_consumer_data">You must enter your Key and Secret from Twitter</string>
     <string name="twitter_webview_name">Twitter account data</string>
-    <string name="twitter_default_msg">Default Tweet to send (Max 120 chars)</string>
+    <string name="twitter_default_msg">Tweet (Max 120 chars)</string>
     <string name="tweet_not_sent">Your Tweet can\'t be sent :-( Please check your Twitter Preferences</string>
     <string name="twitter_prefs_saved">Twitter OAuth Access Token saved in Preferences</string>
 

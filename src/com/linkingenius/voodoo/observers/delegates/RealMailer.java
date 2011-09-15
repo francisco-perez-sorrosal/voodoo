@@ -35,7 +35,7 @@ public class RealMailer extends Authenticator {
 	
 	private static final String DEFAULT_FROM_EMAIL = "voodoocallkiller.no-reply@linkingenius.com";
 	private static final String DEFAULT_SUBJECT = "Autoresponse from VooDoo Call Killer App";
-	private static final String DEFAULT_BODY = "The person you are trying to communicate is busy at this time. Please call him late. Sent with #VooDooCallKiller. Find me in Android Market: http://tiny.cc/voodoocallkiller";
+	private static final String DEFAULT_BODY = "The person you are trying to communicate is busy at this time. Please call him late.\n\nSent with #VooDooCallKiller. Find me in Android Market: http://tiny.cc/voodoocallkiller";
 	
 	protected static final String EMAIL_PREFS = "email_preferences";
 	
@@ -79,7 +79,7 @@ public class RealMailer extends Authenticator {
 
 		from = ""; // email sent from
 		subject = ""; // email subject
-		body = ""; // email body
+		body = DEFAULT_BODY; // email body
 		multipart = new MimeMultipart();
 
 		debuggable = false; // debug mode on or off - default off
@@ -169,7 +169,6 @@ public class RealMailer extends Authenticator {
 			setTo(toArr);
 			setFrom(DEFAULT_FROM_EMAIL);
 			setSubject(DEFAULT_SUBJECT);
-			setBody(DEFAULT_BODY);
 			try {
 				if (send(callInfo.getContext())) {
 					Log.d(TAG, "Email sent.");

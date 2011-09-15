@@ -24,7 +24,7 @@
     <string name="done_tag">Aceptar</string>
     <string name="clear_tag">Limpiar</string>
     <string name="close_tag">Cerrar</string>
-    <string name="email">E-mail del usuario</string>
+    <string name="email">Usuario de GMail</string>
     <string name="password">Password</string>
     <string name="no_network">Conexión de red no disponible</string>
     
@@ -51,6 +51,7 @@
     <!-- Email related strings -->    
     <string name="email_enabled">Enviar e-mail?</string>
     <string name="email_name">Configuración de GMail</string>
+    <string name="email_default_msg">Texto a enviar</string>
     <string name="email_wrong_user_data">Debes introducir tu usuario y password de GMail</string>
     <string name="no_email_addresses_found">No se encontraron direcciones de e-mail de destino</string>
     <string name="email_prefs_saved">Datos de usuario de e-mail guardados</string>
@@ -67,7 +68,7 @@
     <string name="twitter_set_right_consumer_data">Por favor, comprueba tu Consumer Key y Secret de Twitter en el menú principal</string>
     <string name="twitter_wrong_consumer_data">Debes poner tu Key y Secret de Twitter</string>
     <string name="twitter_webview_name">Configuración de Twitter</string>
-    <string name="twitter_default_msg">Tweet defecto (Max 120 caract.)</string>
+    <string name="twitter_default_msg">Tweet (Max 120 caract.)</string>
     <string name="tweet_not_sent">Tu Tweet no se ha podido enviar :-( Por favor, comprueba si tus datos son correctos</string>
     <string name="twitter_prefs_saved">Twitter OAuth Access Token guardado</string>
 
