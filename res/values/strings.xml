@@ -80,4 +80,6 @@
     <string name="hour_log_tag">Hour: </string>
     <string name="confirm_clear_log_msg">Are you sure you want to remove log info?</string>
     <string name="log_empty_msg">No received calls in log</string>
+    <string name="log_context_menu_title">Call to:</string>
+    <string name="log_call_failed">Call failed</string>
 </resources>

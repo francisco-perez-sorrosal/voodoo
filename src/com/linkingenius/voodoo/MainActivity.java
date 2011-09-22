@@ -14,11 +14,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -118,7 +121,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 
 		filteredContactsLV = (ListView) findViewById(R.id.filteredContactsLV);
 		filteredContactsLV.setOnItemClickListener(this);
-
+		
 		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
 				IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
