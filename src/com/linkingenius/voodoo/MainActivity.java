@@ -1,6 +1,10 @@
 package com.linkingenius.voodoo;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -21,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -40,6 +46,7 @@ import com.linkingenius.voodoo.observers.UserNotifier;
 import com.linkingenius.voodoo.utils.AboutDialogBuilder;
 import com.linkingenius.voodoo.utils.Contact;
 import com.linkingenius.voodoo.utils.Tools;
+import com.linkingenius.voodoo.utils.numberpicker.NumberPickerDialog;
 
 /**
  * Main activity for my blacklist application. Contains the start/stop button 
@@ -49,9 +56,12 @@ import com.linkingenius.voodoo.utils.Tools;
  * @author Francisco PŽrez-Sorrosal (fperez)
  *
  */
-public class MainActivity extends Activity implements OnClickListener, OnItemClickListener {
+public class MainActivity extends Activity implements OnClickListener, OnItemClickListener,  NumberPickerDialog.OnNumberSetListener  {
 
 	private static final String TAG = "MainActivity";
+	
+	public static final String TIMER_PREFS = "timer_preferences";
+	public static final String TIMER_MESSAGE = "timer_message";
 	
 	private static final int PICK_CONTACT = 0;
 
@@ -60,13 +70,32 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	private ToggleButton emailTB;
 	private ToggleButton twitterTB;
 	private ListView filteredContactsLV;
+	private TextView timer;
 	private ArrayAdapter<Contact> filteredContactsAdapter;
 
 	private IncomingCallScanner incomingCallScanner;
 	
+	private SharedPreferences timerPreferences;
+	
+	private int minutes;
+	
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			incomingCallScanner = ((IncomingCallScanner.LocalBinder)service).getService();
+			incomingCallScanner = ((IncomingCallScanner.LocalBinder) service).getService();
+			TextView timer = (TextView) findViewById(R.id.timerLabel);
+			if(minutes != 0) {
+				Calendar now = Calendar.getInstance();
+		        now.add(Calendar.MINUTE, minutes);
+		        Date date = now.getTime();
+		        TimeZone tz = TimeZone.getDefault();
+		        
+		        DateFormat formatter = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+		        formatter.setTimeZone(tz);
+		        String timeAsString = formatter.format(date);
+		        timer.setText(String.format(getResources().getString(R.string.timer_set_text), timeAsString));
+		        timer.refreshDrawableState();
+				incomingCallScanner.setVoodooTimer(minutes);
+			}
 			Log.d(TAG, "Observers " + incomingCallScanner.nofObservers());
 			startStopTB.setChecked(true);
 			if(incomingCallScanner.isAllCallsFilterEnabled())
@@ -79,6 +108,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 
 		public void onServiceDisconnected(ComponentName className) {
 			Log.d(TAG, "onServiceDisconnected: Incoming Call Scanner Disconnected");
+			minutes = 0;
+			TextView timer = (TextView) findViewById(R.id.timerLabel);
+        		timer.setText(R.string.timer_default_text);
+			clearFilterForAllCallsFromService();
+			clearEmailConnectionFromService();
+			clearTwitterConnectionFromService();
+			startStopTB.setChecked(false);
 			incomingCallScanner = null;
 		}
 	};
@@ -117,17 +153,25 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		filteredContactsLV.setAdapter(filteredContactsAdapter);
 		filteredContactsAdapter.notifyDataSetChanged();
 		filteredContactsLV.refreshDrawableState();
+		
+		timer = (TextView) findViewById(R.id.timerLabel);
+		timerPreferences = getSharedPreferences(TIMER_PREFS, Activity.MODE_PRIVATE);
 
+		// This binding is required because we have to check if the service was
+		// previously started in a previous invocation. 
 		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
-				IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
-		
+			IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
+		timer.setText(timerPreferences.getString(TIMER_MESSAGE, ""));
 		Log.d(TAG, "onCreate");
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		timerPreferences.edit()
+		.putString(TIMER_MESSAGE, (String) timer.getText())
+		.commit();
 		// Don't call clearTwitter/MailConnection() on destroying this activity
 		// cause, if enabled, messages must be sent!!!
 		unbindService(mConnection);
@@ -165,6 +209,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 			break;
 		case R.id.twitter:
 			launchTwitterConfigurationActivity();
+			break;
+		case R.id.timer:
+			NumberPickerDialog dialog = new NumberPickerDialog(this, android.R.style.Theme_Translucent, 60);
+            dialog.setTitle(getString(R.string.dialog_picker_title));
+            dialog.setOnNumberSetListener(this);
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+            dialog.show();
 			break;
 		case R.id.logs:
 			UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
@@ -207,13 +258,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 						filteredContactsLV.refreshDrawableState();
 						Log.d(TAG, name + " has been filtered");
 					} else {
-						Toast.makeText(this, getResources().getString(R.string.contact_already_filtered), Toast.LENGTH_SHORT).show();
+						Toast.makeText(this, R.string.contact_already_filtered, Toast.LENGTH_SHORT).show();
 					}
 				} else {
-					Toast.makeText(this, getResources().getString(R.string.missing_contact_data), Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, R.string.missing_contact_data, Toast.LENGTH_SHORT).show();
 				}
 			} else {
-				Toast.makeText(this, getResources().getString(R.string.no_contact_selected), Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, R.string.no_contact_selected, Toast.LENGTH_SHORT).show();
 			}
 			break;
 		}
@@ -226,19 +277,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		case R.id.startStopTB:
 			if(startStopTB.isChecked()) {
 				Log.d(TAG, "onClick: starting service");
-				Intent intent = new Intent(this, IncomingCallScanner.class);
-				startService(intent);
-				// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
-				bindService(new Intent(this, 
-						IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
-				Log.d(TAG, "onClick: service started");
+				startIncomingCallScannerService();
 			} else {
 				Log.d(TAG, "onClick: stopping service");
-				clearFilterForAllCallsFromService();
-				clearEmailConnectionFromService();
-				clearTwitterConnectionFromService();
 				stopService(new Intent(this, IncomingCallScanner.class));
-				Log.d(TAG, "onClick: service stopped");
 			}
 			break;
 		case R.id.filterAllCB:
@@ -298,7 +340,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		final Contact contact = (Contact) filteredContactsLV.getItemAtPosition(position);
 		AlertDialog.Builder adb=new AlertDialog.Builder(MainActivity.this);
 		adb.setTitle(getResources().getString(R.string.delete_op));
-		adb.setMessage("Are you sure you want to delete " + contact.getName());
+		adb.setMessage(String.format(getResources().getString(R.string.remove_user),  contact.getName()));
 		adb.setPositiveButton(getResources().getString(R.string.ok_tag), new AlertDialog.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
 				BlackList.INSTANCE.removeContact(getApplicationContext(), contact);
@@ -310,18 +352,44 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		adb.show();
 	}
 	
+	public void onNumberSet(int minutes) {
+        Log.d("NumberPicker", "Number selected: " + minutes);
+		this.minutes = minutes;
+        TextView timer = (TextView) findViewById(R.id.timerLabel);
+        if(incomingCallScanner == null) {
+	        if(minutes == 0) {
+	        		timer.setText(R.string.timer_default_text);
+	        } else {
+		        timer.setText(String.format(getResources().getString(R.string.timer_set_text), Integer.toString(minutes)));
+	        }
+        } else {
+        		Toast.makeText(this, getResources().getString(R.string.timer_service_running), Toast.LENGTH_SHORT).show();
+        }
+    }
+	
 	// ------------------------- Private Methods ----------------------------
 	
 	private void clearFilterForAllCallsFromService() {
-		incomingCallScanner.filterAllCalls(false);
+		if(incomingCallScanner != null)
+			incomingCallScanner.filterAllCalls(false);
 		filterAllCB.setChecked(false);
+	}
+	
+	private void startIncomingCallScannerService() {
+		if(incomingCallScanner == null) {
+			// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND
+    			bindService(new Intent(this, 
+    					IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
+		}
+		startService(new Intent(this, IncomingCallScanner.class));
 	}
 	
 	// ------------------------- Twitter Related Stuff ------------------------
 			
 	private void clearTwitterConnectionFromService() {
+		if(incomingCallScanner != null)
 			incomingCallScanner.removeCallObserver(Twitterer.INSTANCE);
-			twitterTB.setChecked(false);
+		twitterTB.setChecked(false);
 	}
 	
 	private  void launchTwitterConfigurationActivity() {
@@ -337,7 +405,8 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	}
 	
 	private void clearEmailConnectionFromService() {
-		incomingCallScanner.removeCallObserver(Mailer.INSTANCE);
+		if(incomingCallScanner != null)
+			incomingCallScanner.removeCallObserver(Mailer.INSTANCE);
 		emailTB.setChecked(false);
 	}
 	
@@ -371,15 +440,9 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	                TextView contactName = (TextView) v.findViewById(R.id.contactName);
 	                TextView contactPhones = (TextView) v.findViewById(R.id.contactPhones);
 	                
-	                if (contactPhoto != null) {
-	                      contactPhoto.setImageBitmap(contact.getPhoto());                            
-	                }
-	                if (contactName != null) {
-	                      contactName.setText(contact.getName());                            
-	                }
-	                if(contactPhones != null){
-	                      contactPhones.setText(contact.getPhoneNumbers().toString());
-	                }
+	                contactPhoto.setImageBitmap(contact.getPhoto());                            
+	                contactName.setText(contact.getName());                            
+	                contactPhones.setText(contact.getPhoneNumbers().toString());
 	            }
 	            return v;
 	    }

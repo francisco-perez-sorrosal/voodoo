@@ -27,6 +27,7 @@
     <string name="email">Usuario de GMail</string>
     <string name="password">Password</string>
     <string name="no_network">Conexión de red no disponible</string>
+    <string name="remove_user">¿Estás seguro de querer borrar a %s?</string>
     
     <!-- Filtering service related strings -->
     <string name="service_name">VooDoo Call Scanner</string>
@@ -82,4 +83,13 @@
     <string name="hour_log_tag">Hora: </string>
     <string name="confirm_clear_log_msg">¿Estás seguro de que quieres borrar el log?</string>
     <string name="log_empty_msg">No se han recibido llamadas todavía</string>
+    
+    <!-- Dialog picker -->
+    <string name="dialog_set_number">Establecer</string>
+    <string name="dialog_cancel">Resetear</string>
+    <string name="dialog_picker_title">Elige los minutos</string>
+    <string name="timer_default_text">Temporizador sin programar</string>
+    <string name="timer_set_text">Temporizador programado para %s min</string>
+    <string name="timer_set_running">El VooDoo parará a las %s</string>
+    <string name="timer_service_running">VooDoo activo. Es necesario pararlo para establecer el temporizador</string>
 </resources>

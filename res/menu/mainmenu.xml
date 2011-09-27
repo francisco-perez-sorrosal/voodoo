@@ -4,6 +4,7 @@
     <group android:id="@+id/maingroup" android:visible="true">
         <item android:id="@+id/contacts" android:icon="@drawable/ic_menu_user" android:title="Contacts" android:titleCondensed="Contacts"></item>
 		<item android:id="@+id/logs" android:icon="@drawable/ic_menu_linechart" android:titleCondensed="Log" android:title="Log of Filtered Calls"></item>
+		<item android:id="@+id/timer" android:icon="@drawable/ic_menu_stopwatch" android:titleCondensed="Timer" android:title="Timer"></item>
         <item android:id="@+id/twitter" android:icon="@drawable/ic_menu_bird" android:titleCondensed="Twitter" android:title="Twitter Data"></item>
         <item android:id="@+id/email" android:icon="@drawable/ic_menu_mail" android:titleCondensed="Email" android:title="Email"></item>
         <item android:id="@+id/about" android:icon="@drawable/ic_menu_about" android:titleCondensed="About" android:title="About"></item>

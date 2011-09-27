@@ -1,14 +1,21 @@
 package com.linkingenius.voodoo;
 
+import static com.linkingenius.voodoo.MainActivity.TIMER_PREFS;
+import static com.linkingenius.voodoo.MainActivity.TIMER_MESSAGE;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Binder;
 import android.os.IBinder;
@@ -33,6 +40,10 @@ import com.linkingenius.voodoo.utils.Contact;
 public class IncomingCallScanner extends Service {
 
 	private static final String TAG = "IncomingCallScanner";
+	
+	private ScheduledThreadPoolExecutor timerExecutor;
+	
+	private ScheduledFuture futureTask;
 
 	private boolean filterAllCalls = false;
 	
@@ -109,7 +120,13 @@ public class IncomingCallScanner extends Service {
 
 	@Override
 	public void onCreate() {
+		Log.d(TAG, "Service created");
+	}
 
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.d(TAG, "VooDoo filtering starting... Received start id " + startId + ": " + intent);
+		timerExecutor = new ScheduledThreadPoolExecutor(1);
 		// Add the log and UserNotifier as default observers
 		addCallObserver(Logger.INSTANCE);
 		addCallObserver(UserNotifier.INSTANCE);
@@ -120,32 +137,37 @@ public class IncomingCallScanner extends Service {
 		filter.addAction("android.intent.action.PHONE_STATE");
 		filter.addAction("android.intent.action.NEW_OUTGOING_CALL");
 		registerReceiver(phoneStateReceiver, filter);
-		Log.d(TAG, "Created");
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(TAG, "Received start id " + startId + ": " + intent);
 		UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
 				UserNotifier.CallScannerNotification.INIT);
+		Log.d(TAG, "VooDoo filtering started");
 		// Service will continue running (sticky) until it's explicitly stopped
 		return START_STICKY;
 	}
-
+	
 	@Override
 	public void onDestroy() {
-		// Stop filtering calls, otherwise they'll continue to be filtered
 		am.setRingerMode(currentAudioMode);
 		am = null;
+		if(futureTask != null) {
+			Log.d(TAG, "Cancelling current timer");
+			futureTask.cancel(true);
+			timerExecutor.shutdown();
+		}
 		unregisterReceiver(phoneStateReceiver);
 		removeCallObserver(Logger.INSTANCE);
 		removeCallObserver(UserNotifier.INSTANCE);
 		UserNotifier.INSTANCE.cancelCallScannerNotification(getApplicationContext());
+		SharedPreferences timerPreferences = getSharedPreferences(TIMER_PREFS, Activity.MODE_PRIVATE);
+		timerPreferences.edit()
+		.putString(TIMER_MESSAGE, getResources().getString(R.string.timer_default_text))
+		.commit();
 		Toast.makeText(getApplicationContext(), R.string.ics_service_stopped, Toast.LENGTH_SHORT).show();
-		Log.d(TAG, "Stopped");
+		Log.d(TAG, "VooDoo service stopped");
 	}
 
 	// ------------------------ End Lifecycle ---------------------------------
+	
+	// -------------------------- Private methods ----------------------------
 	
 	private boolean killCall(Context context) {
 		try {
@@ -218,5 +240,33 @@ public class IncomingCallScanner extends Service {
 		}	
 	}
 	
+	public void setVoodooTimer(long minutes) {
+			if(futureTask != null) {
+				if(! futureTask.isDone()) {
+					Log.d(TAG, "Canceling current VooDoo timer task");
+					futureTask.cancel(true);
+					timerExecutor.purge();
+				}
+			}
+			futureTask = timerExecutor.schedule(new VooDooTimer(), 
+					minutes, TimeUnit.SECONDS);
+			Log.d(TAG, "New VooDoo timer task running");
+	}
+	
+	// -------------------------- Private classes -----------------------------
+	
+		/**
+		 * Automatically stops the service
+		 * 
+		 * Francisco PŽrez-Sorrosal (fperez)
+		 *
+		 */
+		private class VooDooTimer implements Runnable {
+
+			public void run() {
+				Log.d(TAG, "Stopping VooDoo call scanner");
+				stopService(new Intent(getApplicationContext(), IncomingCallScanner.class));
+			}
+		}
 }
 

@@ -26,6 +26,7 @@
     <string name="email">GMail User</string>
     <string name="password">Password</string>
     <string name="no_network">Network connection not available</string>
+    <string name="remove_user">Are you sure you want to delete %s</string>
     
     <!-- Filtering service related strings -->
     <string name="service_name">VooDoo Call Scanner</string>
@@ -81,4 +82,13 @@
     <string name="hour_log_tag">Hour: </string>
     <string name="confirm_clear_log_msg">Are you sure you want to remove log info?</string>
     <string name="log_empty_msg">No received calls in log</string>
+    
+   	<!-- Dialog picker -->
+    <string name="dialog_set_number">Set</string>
+    <string name="dialog_cancel">Reset</string>
+    <string name="dialog_picker_title">Choose a number</string>
+    <string name="timer_default_text">Timer not set</string>
+    <string name="timer_set_text">Timer set to %s min</string>
+    <string name="timer_set_running">VooDoo will be stopped at %s</string>
+    <string name="timer_service_running">VooDoo is active. Stop first to set timer</string>
 </resources>
