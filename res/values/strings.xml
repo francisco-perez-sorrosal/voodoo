@@ -5,7 +5,8 @@
 		This application allows to do VooDoo (filter temporarily) on the incoming 
 		calls received from your contacts. It also allows to configure different 
 		actions on response to incoming calls (e.g. Tweet a message or send an 
-		email to callers.)\n\nMenu icons by Joseph Wain / glyphish.com
+		email to callers.)\n\nImages by Manuel I. Estepa Duque\nMenu icons by 
+		Joseph Wain / glyphish.com
 	</string>
     <string name="app_author">Author: Francisco Pérez-Sorrosal
     \nhttp://linkedin.com/in/fperezsorrosal</string>
@@ -31,7 +32,7 @@
     <!-- Filtering service related strings -->
     <string name="service_name">VooDoo Call Scanner</string>
     <string name="service_name_description">This service is filtering undesired incoming calls!</string>
-    <string name="ics_service_enabled">Voodoo Service</string>
+    <string name="ics_service_enabled">Voodoo</string>
     <string name="started">Started</string>
     <string name="stopped">Stopped</string>
     <string name="starting_ics_service">Starting Voodoo Call Scanner</string>
@@ -40,16 +41,16 @@
     <string name="ics_service_started">VooDoo Call Scanner started</string>
     <string name="ics_service_not_bound">VooDoo Call Scanner not bound. Connect first!</string>    
     <string name="ics_service_stopped">VooDoo Call Scanner has been stopped</string>
-    <string name="filtered_contacts">Doing VooDoo on...</string>
+    <string name="filtered_contacts">VooDoo-ing...</string>
     <string name="no_contact_selected">No contact was selected</string>
     <string name="contact_already_filtered">Contact already filtered</string>
     <string name="missing_contact_data">Some contact data (Name or Phone Number) is missing</string>
-    <string name="filter_all_calls">Do VooDoo on all calls?</string>
-    <string name="call_message_1">Call from </string>
-    <string name="call_message_2"> received. Call ended.</string>
+    <string name="filter_all_calls">all callers?</string>
+    <string name="call_message">Call from %s received. Call ended.</string>
 
     <!-- Email related strings -->    
-    <string name="email_enabled">E-mail caller?</string>
+    <string name="email_enabled">E-mail caller ON</string>
+    <string name="email_disabled">E-mail caller OFF</string>
     <string name="email_name">GMail User Data</string>
     <string name="email_default_msg">Text to send</string>
     <string name="email_wrong_user_data">You must enter your GMail user and password</string>
@@ -58,7 +59,8 @@
     <string name="email_not_sent">Your email can\'t be sent :-( Please check your Mail Preferences</string>
     
     <!-- Twitter related strings -->
-    <string name="twitter_enabled">Tweet calls?</string>
+    <string name="twitter_enabled">Tweet calls ON</string>
+    <string name="twitter_disabled">Tweet calls OFF</string>
     <string name="twitter_callback">twitter-callback:///</string>
     <string name="twitter_configuration">Twitter Configuration</string>
     <string name="twitter_conn_allowed">Now you can connect to Twitter. Press button</string>
@@ -86,7 +88,7 @@
    	<!-- Dialog picker -->
     <string name="dialog_set_number">Set</string>
     <string name="dialog_cancel">Reset</string>
-    <string name="dialog_picker_title">Choose a number</string>
+    <string name="dialog_picker_title">Choose minutes (0-200)</string>
     <string name="timer_default_text">Timer not set</string>
     <string name="timer_set_text">Timer set to %s min</string>
     <string name="timer_set_running">VooDoo will be stopped at %s</string>

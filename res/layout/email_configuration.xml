@@ -2,7 +2,6 @@
 <RelativeLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
-  android:background="@color/background"
   android:orientation="vertical"
   android:layout_width="fill_parent" android:weightSum="1" android:layout_height="fill_parent">
     <com.google.ads.AdView ads:adUnitId="a14e67a128c0a6e" ads:adSize="BANNER" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/adView"></com.google.ads.AdView>
@@ -10,13 +9,13 @@
     <EditText android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/emailT" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true">
         <requestFocus></requestFocus>
     </EditText>
-    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true" android:layout_marginTop="14dp"></View>
+    <View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textView3" android:layout_alignParentLeft="true" android:layout_marginTop="5dp"></View>
     <TextView android:layout_height="wrap_content" android:text="@string/email" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="fill_parent" android:id="@+id/textView1" android:textSize="22sp" android:layout_below="@+id/view1" android:layout_alignParentRight="true" android:layout_marginLeft="5dp"></TextView>
     <TextView android:layout_height="wrap_content" android:text="@string/password" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="fill_parent" android:id="@+id/textView2" android:textSize="22sp" android:layout_below="@+id/emailT" android:layout_alignParentRight="true" android:layout_marginLeft="5dp"></TextView>
     <EditText android:id="@+id/emailPasswordT" android:layout_height="wrap_content" android:layout_width="fill_parent" android:inputType="textPassword" android:layout_below="@+id/textView2" android:layout_alignParentLeft="true"></EditText>
     <TextView android:layout_height="wrap_content" android:text="@string/email_default_msg" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_width="fill_parent" android:id="@+id/textView4" android:textSize="22sp" android:layout_below="@+id/emailPasswordT" android:layout_alignParentLeft="true" android:layout_marginLeft="5dp"></TextView>
-    <View android:layout_height="2px" android:background="@color/separator" android:layout_width="fill_parent" android:id="@+id/view2" android:layout_below="@+id/emailMessageT" android:layout_alignParentLeft="true"></View>
-    <EditText android:minLines="5" android:gravity="top" android:id="@+id/emailMessageT" android:editable="true" android:layout_height="wrap_content" android:width="80dp" android:layout_width="fill_parent" android:inputType="textMultiLine" android:layout_below="@+id/textView4" android:layout_alignParentLeft="true"></EditText>
+    <View android:layout_height="2px" android:background="@color/separator" android:layout_width="fill_parent" android:id="@+id/view2" android:layout_below="@+id/emailMessageT" android:layout_alignParentLeft="true" android:layout_marginTop="5dp"></View>
+    <EditText android:minLines="5" android:maxLines="6" android:gravity="top" android:id="@+id/emailMessageT" android:editable="true" android:layout_height="wrap_content" android:width="80dp" android:layout_width="fill_parent" android:inputType="textMultiLine" android:layout_below="@+id/textView4" android:layout_alignParentLeft="true"></EditText>
     <LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/LinearLayout1" android:layout_below="@+id/view2" android:layout_alignParentLeft="true" android:layout_marginTop="5dp">
         <Button android:id="@+id/emailDoneB" android:text="@string/done_tag" android:layout_width="100dp" android:layout_height="wrap_content"></Button>
         <Button android:id="@+id/emailClearB" android:text="@string/clear_tag" android:layout_width="100dp" android:layout_height="wrap_content"></Button>

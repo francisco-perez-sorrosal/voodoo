@@ -5,11 +5,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:padding="10dip"
+    android:background="@color/transparent_red"
     >
-    
-    <com.linkingenius.voodoo.utils.numberpicker.NumberPicker
-        android:id="@+id/pref_num_picker"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" />
+    <com.linkingenius.voodoo.utils.numberpicker.NumberPicker android:layout_height="fill_parent" android:layout_width="wrap_content" android:gravity="center|center_vertical|center_horizontal" android:id="@+id/pref_num_picker" android:layout_gravity="center"></com.linkingenius.voodoo.utils.numberpicker.NumberPicker>
 
 </LinearLayout>

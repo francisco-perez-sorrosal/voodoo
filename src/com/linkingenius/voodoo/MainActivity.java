@@ -162,7 +162,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		// For versions > 2.1 change binding for Context.BIND_NOT_FOREGROUND 
 		bindService(new Intent(this, 
 			IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
-		timer.setText(timerPreferences.getString(TIMER_MESSAGE, ""));
+		timer.setText(timerPreferences.getString(TIMER_MESSAGE, getResources().getString(R.string.timer_default_text)));
 		Log.d(TAG, "onCreate");
 	}
 

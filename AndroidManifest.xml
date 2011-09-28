@@ -20,18 +20,24 @@
 		android:label="@string/app_name">
 		<activity android:name=".MainActivity" 
 					android:label="@string/app_name"
-					android:launchMode="singleTask">
+					android:launchMode="singleTask"
+					android:theme="@style/VooDooTheme">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 		<service android:enabled="true" android:name=".IncomingCallScanner" />
-		<activity android:name=".ShowLogActivity" />
+		<activity android:name=".ShowLogActivity"
+			android:theme="@style/VooDooThemeStandard"/>
 		<activity android:name=".EmailConfigurationActivity"
-			android:windowSoftInputMode="adjustPan" />
+			android:windowSoftInputMode="adjustPan" 
+			android:screenOrientation="portrait"
+			android:theme="@style/VooDooThemeStandard"/>
 		<activity android:name=".TwitterConfigurationActivity" 
-			android:windowSoftInputMode="adjustPan"/>
+			android:windowSoftInputMode="adjustPan"
+			android:screenOrientation="portrait"
+			android:theme="@style/VooDooThemeStandard"/>
 		<activity android:name=".TwitterWebviewActivity" />
 		<!-- Google Ads Activity -->
 		<activity android:name="com.google.ads.AdActivity"

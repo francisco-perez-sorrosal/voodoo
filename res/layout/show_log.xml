@@ -3,10 +3,11 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:ads="http://schemas.android.com/apk/lib/com.google.ads"
 	android:orientation="vertical" android:layout_width="fill_parent"
-	android:layout_height="fill_parent" android:background="@color/background" android:weightSum="1">
+	android:layout_height="fill_parent" android:weightSum="1">
 	<com.google.ads.AdView ads:adUnitId="a14e67a128c0a6e" ads:adSize="BANNER" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/adView"></com.google.ads.AdView>
+	<View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textLog" android:layout_alignParentLeft="true" android:layout_marginTop="5dp"></View>
 	<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnBack" android:text="@string/clear_log" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"></Button>
-	<ScrollView android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true" android:isScrollContainer="true" android:layout_height="375dp" android:id="@+id/scrollView1" android:scrollbarStyle="outsideInset" android:scrollbars="vertical" android:layout_alignParentLeft="true" android:layout_below="@+id/textLog" android:layout_above="@+id/btnBack">
+	<ScrollView android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true" android:isScrollContainer="true" android:layout_height="375dp" android:id="@+id/scrollView1" android:scrollbarStyle="outsideInset" android:scrollbars="vertical" android:layout_alignParentLeft="true" android:layout_above="@+id/btnBack" android:layout_below="@+id/view1">
 		<TableLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/showLogLayout" android:orientation="vertical">
 		</TableLayout>
 	</ScrollView>

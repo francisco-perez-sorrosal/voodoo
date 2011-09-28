@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="VooDooTheme" parent="android:Theme.Black">
+    	<item name="android:windowNoTitle">true</item>
+    	<item name="android:windowBackground">@drawable/voodoo_background</item>
+    	<item name="android:listViewStyle">@style/TransparentListView</item>
+	</style>
+	<style name="VooDooThemeStandard" parent="android:Theme.Black">
+    	<item name="android:windowNoTitle">true</item>
+    	<item name="android:windowBackground">@drawable/voodoo_background_std</item>
+    	<item name="android:listViewStyle">@style/TransparentListView</item>
+	</style>
+	 <style name="TransparentListView" parent="@android:style/Widget.ListView">
+  		<item name="android:cacheColorHint">@android:color/transparent</item>
+ 	</style>
+</resources>

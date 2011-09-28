@@ -5,8 +5,8 @@
 		Esta aplicación te permite hacer VooDoo (filtrar temporalmente) las
 		llamadas entrantes recibidas. Permite también configurar diferentes
 		acciones en respuesta a dichas llamadas (p.ej. Twittear un mensaje 
-		o enviar un email a quien haya llamado.)\n\nIconos del menú por 
-		Joseph Wain / glyphish.com
+		o enviar un email a quien haya llamado.)\n\nImagenes por Manuel I. 
+		Estepa Duque\nIconos del menú por Joseph Wain / glyphish.com
 	</string>
     <string name="app_author">Autor: Francisco Pérez-Sorrosal
     \nhttp://linkedin.com/in/fperezsorrosal</string>
@@ -32,7 +32,7 @@
     <!-- Filtering service related strings -->
     <string name="service_name">VooDoo Call Scanner</string>
     <string name="service_name_description">¡Este servicio está filtrando llamadas no deseadas!</string>
-    <string name="ics_service_enabled">Servicio de VooDoo</string>
+    <string name="ics_service_enabled">VooDoo</string>
     <string name="started">Iniciado</string>
     <string name="stopped">Detenido</string>
     <string name="starting_ics_service">Iniciando Voodoo Call Scanner</string>
@@ -41,16 +41,16 @@
     <string name="ics_service_started">VooDoo Call Scanner iniciado</string>
     <string name="ics_service_not_bound">VooDoo Call Scanner todavía no iniciado. Pulsa el botón...</string>    
     <string name="ics_service_stopped">VooDoo Call Scanner detenido</string>
-    <string name="filtered_contacts">Haciendo VooDoo a...</string>
+    <string name="filtered_contacts">VooDoo a...</string>
     <string name="no_contact_selected">No se ha seleccionado ningún contacto</string>
     <string name="contact_already_filtered">El contacto ya está filtrado</string>
     <string name="missing_contact_data">Faltan datos críticos del contacto (Nombre y/o Teléfono)</string>
-    <string name="filter_all_calls">¿VooDoo a todo el mundo?</string>
-    <string name="call_message_1">Llamada de </string>
-    <string name="call_message_2"> recibida. Llamada finalizada.</string>
+    <string name="filter_all_calls">¿todos?</string>
+    <string name="call_message">Llamada de %s recibida. Llamada finalizada.</string>
 
-    <!-- Email related strings -->    
-    <string name="email_enabled">Enviar e-mail?</string>
+    <!-- Email related strings -->
+    <string name="email_enabled">Enviar email</string>
+    <string name="email_disabled">No enviar email</string>
     <string name="email_name">Configuración de GMail</string>
     <string name="email_default_msg">Texto a enviar</string>
     <string name="email_wrong_user_data">Debes introducir tu usuario y password de GMail</string>
@@ -59,7 +59,8 @@
     <string name="email_not_sent">El e-mail no se ha podido enviar :-( Por favor, comprueba si tus datos son correctos</string>
     
     <!-- Twitter related strings -->
-    <string name="twitter_enabled">Tweetear?</string>
+    <string name="twitter_enabled">Tweetear</string>
+    <string name="twitter_disabled">No tweetear</string>
     <string name="twitter_callback">twitter-callback:///</string>
     <string name="twitter_configuration">Configuración de Twitter</string>
     <string name="twitter_conn_allowed">Ya puedes conectar el Twitteo. Pulsa el botón...</string>
@@ -77,7 +78,7 @@
 	<string name="call_log">Log de Llamadas</string>
     <string name="log_label">Llamadas recibidas</string>
     <string name="clear_log">Limpiar Log</string>
-    <string name="caller_log_tag">Llamada de: </string>
+    <string name="caller_log_tag">Nombre: </string>
     <string name="phone_log_tag">Tlfn.: </string>
     <string name="date_log_tag">Fecha: </string>
     <string name="hour_log_tag">Hora: </string>
@@ -87,7 +88,7 @@
     <!-- Dialog picker -->
     <string name="dialog_set_number">Establecer</string>
     <string name="dialog_cancel">Resetear</string>
-    <string name="dialog_picker_title">Elige los minutos</string>
+    <string name="dialog_picker_title">Elige los minutos (0-200)</string>
     <string name="timer_default_text">Temporizador sin programar</string>
     <string name="timer_set_text">Temporizador programado para %s min</string>
     <string name="timer_set_running">El VooDoo parará a las %s</string>

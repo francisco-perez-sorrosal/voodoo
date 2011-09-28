@@ -93,9 +93,7 @@ public enum UserNotifier implements CallObserver {
 	public void callNotification(CallInfo callInfo) {
 		CharSequence text = 
 				callInfo.getTime() + " "
-				+ callInfo.getContext().getResources().getString(R.string.call_message_1)
-				+ " " + callInfo.getCaller() + " " 
-				+ callInfo.getContext().getResources().getString(R.string.call_message_2);
+				+ String.format(callInfo.getContext().getResources().getString(R.string.call_message), callInfo.getCaller());
 		showToastWithImage(callInfo.getContext(), text, R.drawable.app_icon);
 		Log.d(TAG, "User notified");
 	}
