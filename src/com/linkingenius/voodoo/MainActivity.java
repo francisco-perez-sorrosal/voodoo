@@ -220,6 +220,10 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
             dialog.show();
 			break;
 		case R.id.logs:
+			if(incomingCallScanner != null) {
+				UserNotifier.INSTANCE.showCallScannerNotification(getApplicationContext(),
+					UserNotifier.CallScannerNotification.SHOW_LOG);
+			}
 			Intent showLogIntent = new Intent(this, ShowLogActivity.class);
 			startActivity(showLogIntent);
 			break;

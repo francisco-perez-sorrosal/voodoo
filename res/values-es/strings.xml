@@ -38,7 +38,7 @@
     <string name="stopped">Detenido</string>
     <string name="starting_ics_service">Iniciando Voodoo Call Scanner</string>
     <string name="incoming_call_received">Llamada entrante recibida</string>
-    <string name="show_log">Mostrando log...</string>
+    <string name="show_log">Llamadas con VooDoo practicado...</string>
     <string name="ics_service_started">VooDoo Call Scanner iniciado</string>
     <string name="ics_service_not_bound">VooDoo Call Scanner todavía no iniciado. Pulsa el botón...</string>    
     <string name="ics_service_stopped">VooDoo Call Scanner detenido</string>
@@ -94,7 +94,7 @@
     <string name="dialog_cancel">Resetear</string>
     <string name="dialog_picker_title">Elige los minutos (0-200)</string>
     <string name="timer_default_text">Temporizador VooDoo sin programar</string>
-    <string name="timer_set_text">VooDoo programado para dentro de %s min</string>
+    <string name="timer_set_text">VooDoo programado para a las %s</string>
     <string name="timer_set_running">El VooDoo parará a las %s</string>
     <string name="timer_service_running">VooDoo activo. Es necesario pararlo para establecer el temporizador</string>
 </resources>

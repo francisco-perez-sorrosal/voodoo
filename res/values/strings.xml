@@ -37,7 +37,7 @@
     <string name="stopped">Stopped</string>
     <string name="starting_ics_service">Starting Voodoo Call Scanner</string>
     <string name="incoming_call_received">Incoming Call Received</string>
-    <string name="show_log">Showing log...</string>
+    <string name="show_log">VooDoo-ed calls...</string>
     <string name="ics_service_started">VooDoo Call Scanner started</string>
     <string name="ics_service_not_bound">VooDoo Call Scanner not bound. Connect first!</string>    
     <string name="ics_service_stopped">VooDoo Call Scanner has been stopped</string>
@@ -93,7 +93,7 @@
     <string name="dialog_cancel">Reset</string>
     <string name="dialog_picker_title">Choose minutes (0-200)</string>
     <string name="timer_default_text">VooDoo Timer not set</string>
-    <string name="timer_set_text">VooDoo set to %s min</string>
+    <string name="timer_set_text">VooDoo will stop at %s</string>
     <string name="timer_set_running">VooDoo will stop at %s</string>
     <string name="timer_service_running">VooDoo is active. Stop first to set timer</string>
 </resources>
