@@ -51,17 +51,6 @@ public enum UserNotifier implements CallObserver {
 				notification.flags |= Notification.FLAG_NO_CLEAR;
 				return notification;
 			}
-		}, 
-		SHOW_LOG {
-			Notification buildNotification(Context context) {
-				int icon = R.drawable.skullnbones;
-				CharSequence tickerText = context.getResources().getString(R.string.show_log);
-				long when = System.currentTimeMillis();
-
-				Notification notification = new Notification(icon, tickerText, when);
-				notification.flags |= Notification.FLAG_NO_CLEAR;
-				return notification;
-			}
 		};
 		
 		abstract Notification buildNotification(Context context);
