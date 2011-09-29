@@ -5,8 +5,8 @@
 		This application allows to do VooDoo (filter temporarily) on the incoming 
 		calls received from your contacts. It also allows to configure different 
 		actions on response to incoming calls (e.g. Tweet a message or send an 
-		email to callers.)\n\nImages by Manuel I. Estepa Duque\nMenu icons by 
-		Joseph Wain / glyphish.com
+		email to callers.)\n\n-Log management tasks by Álvaro Gutierrez Leña
+		\n-Images by Manuel I. Estepa Duque\n-Menu icons by Joseph Wain / glyphish.com
 	</string>
     <string name="app_author">Author: Francisco Pérez-Sorrosal
     \nhttp://linkedin.com/in/fperezsorrosal</string>
@@ -76,7 +76,7 @@
 
 	<!-- Call log related strings -->
 	<string name="call_log">Call Log</string>
-    <string name="log_label">Received Calls</string>
+    <string name="log_label">VooDoo-ed Calls</string>
     <string name="clear_log">Clear Log</string>
     <string name="caller_log_tag">Caller: </string>
     <string name="phone_log_tag">Phone: </string>
@@ -84,6 +84,9 @@
     <string name="hour_log_tag">Hour: </string>
     <string name="confirm_clear_log_msg">Are you sure you want to remove log info?</string>
     <string name="log_empty_msg">No received calls in log</string>
+    <string name="press_to_call">(Press to call)</string>
+    <string name="log_context_menu_title">Call to:</string>
+    <string name="log_call_failed">Call failed</string>
     
    	<!-- Dialog picker -->
     <string name="dialog_set_number">Set</string>

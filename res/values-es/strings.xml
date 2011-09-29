@@ -5,8 +5,9 @@
 		Esta aplicación te permite hacer VooDoo (filtrar temporalmente) las
 		llamadas entrantes recibidas. Permite también configurar diferentes
 		acciones en respuesta a dichas llamadas (p.ej. Twittear un mensaje 
-		o enviar un email a quien haya llamado.)\n\nImagenes por Manuel I. 
-		Estepa Duque\nIconos del menú por Joseph Wain / glyphish.com
+		o enviar un email a quien haya llamado.)\n\n-Gestión del Log por
+		Álvaro Gutierrez Leña\n-Imagenes por Manuel I. Estepa Duque\n-Iconos 
+		de menú de Joseph Wain / glyphish.com
 	</string>
     <string name="app_author">Autor: Francisco Pérez-Sorrosal
     \nhttp://linkedin.com/in/fperezsorrosal</string>
@@ -16,7 +17,7 @@
     <string name="version">Version %s</string>
     <string name="about">Sobre %s</string>
     <string name="unknown_contact">Contacto desconocido</string>
-    <string name="delete_op">Oeración de borrado</string>
+    <string name="delete_op">Operación de borrado</string>
     <string name="ok_tag">Si</string>
     <string name="cancel_tag">No</string>
     <string name="on_tag">On</string>
@@ -76,7 +77,7 @@
 
 	<!-- Call log related strings -->
 	<string name="call_log">Log de Llamadas</string>
-    <string name="log_label">Llamadas recibidas</string>
+    <string name="log_label">Llamadas VooDoo</string>
     <string name="clear_log">Limpiar Log</string>
     <string name="caller_log_tag">Nombre: </string>
     <string name="phone_log_tag">Tlfn.: </string>
@@ -84,6 +85,9 @@
     <string name="hour_log_tag">Hora: </string>
     <string name="confirm_clear_log_msg">¿Estás seguro de que quieres borrar el log?</string>
     <string name="log_empty_msg">No se han recibido llamadas todavía</string>
+    <string name="press_to_call">(Pulsa y llama)</string>
+    <string name="log_context_menu_title">Llamar a:</string>
+    <string name="log_call_failed">Llamada fallida</string>
     
     <!-- Dialog picker -->
     <string name="dialog_set_number">Establecer</string>

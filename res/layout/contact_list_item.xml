@@ -20,7 +20,7 @@
             android:layout_height="0dip"
             android:layout_weight="1"
             android:textSize="15sp"
-            android:textColor="@color/green"
+            android:textColor="@color/fresa"
             android:gravity="center_vertical"
         />
         <TextView
@@ -29,7 +29,7 @@
             android:layout_height="0dip"
             android:layout_weight="1"
             android:textSize="12sp"
-            android:textColor="@color/cyan"
+            android:textColor="@color/strawberry"
             android:singleLine="true"
             android:ellipsize="marquee"
         />

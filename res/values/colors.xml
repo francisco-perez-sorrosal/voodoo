@@ -8,4 +8,7 @@
 	<color name="cyan">#FF00FFFF</color>
 	<color name="green">#FF00FF00</color>
 	<color name="white">#FFFFFFFF</color>
+	<color name="strawberry">#FFB3446C</color>
+	<color name="fresa">#FFBF3030</color>
+	<color name="ruby">#FFE0115F</color>
 </resources>

@@ -6,10 +6,11 @@
 	android:layout_height="fill_parent" android:weightSum="1">
 	<com.google.ads.AdView ads:adUnitId="a14e67a128c0a6e" ads:adSize="BANNER" android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/adView"></com.google.ads.AdView>
 	<View android:layout_width="fill_parent" android:layout_height="2px" android:id="@+id/view1" android:background="@color/separator" android:layout_below="@+id/textLog" android:layout_alignParentLeft="true" android:layout_marginTop="5dp"></View>
-	<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnBack" android:text="@string/clear_log" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"></Button>
+	<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/btnClear" android:text="@string/clear_log" android:layout_alignParentBottom="true" android:layout_centerHorizontal="true"></Button>
 	<ScrollView android:layout_width="fill_parent" android:scrollbarAlwaysDrawVerticalTrack="true" android:isScrollContainer="true" android:layout_height="375dp" android:id="@+id/scrollView1" android:scrollbarStyle="outsideInset" android:scrollbars="vertical" android:layout_alignParentLeft="true" android:layout_above="@+id/btnBack" android:layout_below="@+id/view1">
 		<TableLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/showLogLayout" android:orientation="vertical">
 		</TableLayout>
 	</ScrollView>
-	<TextView android:textStyle="bold" android:layout_width="fill_parent" android:id="@+id/textLog" android:text="@string/log_label" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_below="@+id/adView" android:layout_alignParentLeft="true"></TextView>
+	<TextView android:textStyle="bold" android:id="@+id/textLog" android:text="@string/log_label" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_below="@+id/adView" android:layout_alignParentLeft="true" android:layout_width="wrap_content"></TextView>
+	<TextView android:id="@+id/logUsage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/press_to_call" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_above="@+id/view1" android:layout_toRightOf="@+id/textLog" android:layout_marginLeft="14dp"></TextView>
 </RelativeLayout>

@@ -9,3 +9,5 @@ Useful Resources
 
 - Reference to block incoming calls in Android: http://hive-mind.org/2011/04/12/android-call-blocking/
 - Reference to send email in Android: http://stackoverflow.com/questions/2020088/sending-email-in-android-using-javamail-api-without-using-the-default-android-app
+
+- About colors: http://proinf.net/permalink/lista_de_nombres_de_colores
