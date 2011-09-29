@@ -92,8 +92,8 @@
     <string name="dialog_set_number">Set</string>
     <string name="dialog_cancel">Reset</string>
     <string name="dialog_picker_title">Choose minutes (0-200)</string>
-    <string name="timer_default_text">Timer not set</string>
-    <string name="timer_set_text">Timer set to %s min</string>
-    <string name="timer_set_running">VooDoo will be stopped at %s</string>
+    <string name="timer_default_text">VooDoo Timer not set</string>
+    <string name="timer_set_text">VooDoo set to %s min</string>
+    <string name="timer_set_running">VooDoo will stop at %s</string>
     <string name="timer_service_running">VooDoo is active. Stop first to set timer</string>
 </resources>

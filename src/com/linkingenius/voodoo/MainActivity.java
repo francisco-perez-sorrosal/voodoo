@@ -62,6 +62,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	
 	public static final String TIMER_PREFS = "timer_preferences";
 	public static final String TIMER_MESSAGE = "timer_message";
+	public static final String TIMER_IN_MINUTES = "timer_in_minutes";
 	
 	private static final int PICK_CONTACT = 0;
 
@@ -163,6 +164,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		bindService(new Intent(this, 
 			IncomingCallScanner.class), mConnection, Context.BIND_DEBUG_UNBIND);
 		timer.setText(timerPreferences.getString(TIMER_MESSAGE, getResources().getString(R.string.timer_default_text)));
+		minutes = timerPreferences.getInt(TIMER_IN_MINUTES, 0);
 		Log.d(TAG, "onCreate");
 	}
 
@@ -171,6 +173,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		super.onDestroy();
 		timerPreferences.edit()
 		.putString(TIMER_MESSAGE, (String) timer.getText())
+		.putInt(TIMER_IN_MINUTES, minutes)
 		.commit();
 		// Don't call clearTwitter/MailConnection() on destroying this activity
 		// cause, if enabled, messages must be sent!!!

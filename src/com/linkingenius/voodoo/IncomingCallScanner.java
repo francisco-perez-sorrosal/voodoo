@@ -40,6 +40,8 @@ import com.linkingenius.voodoo.utils.Contact;
 public class IncomingCallScanner extends Service {
 
 	private static final String TAG = "IncomingCallScanner";
+
+	private static final int SECS_IN_A_MINUTE = 60;
 	
 	private ScheduledThreadPoolExecutor timerExecutor;
 	
@@ -249,7 +251,7 @@ public class IncomingCallScanner extends Service {
 				}
 			}
 			futureTask = timerExecutor.schedule(new VooDooTimer(), 
-					minutes, TimeUnit.SECONDS);
+					minutes * SECS_IN_A_MINUTE, TimeUnit.SECONDS);
 			Log.d(TAG, "New VooDoo timer task running");
 	}
 	
@@ -267,6 +269,7 @@ public class IncomingCallScanner extends Service {
 				Log.d(TAG, "Stopping VooDoo call scanner");
 				stopService(new Intent(getApplicationContext(), IncomingCallScanner.class));
 			}
+			
 		}
 }
 

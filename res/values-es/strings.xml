@@ -93,8 +93,8 @@
     <string name="dialog_set_number">Establecer</string>
     <string name="dialog_cancel">Resetear</string>
     <string name="dialog_picker_title">Elige los minutos (0-200)</string>
-    <string name="timer_default_text">Temporizador sin programar</string>
-    <string name="timer_set_text">Temporizador programado para %s min</string>
+    <string name="timer_default_text">Temporizador VooDoo sin programar</string>
+    <string name="timer_set_text">VooDoo programado para dentro de %s min</string>
     <string name="timer_set_running">El VooDoo parará a las %s</string>
     <string name="timer_service_running">VooDoo activo. Es necesario pararlo para establecer el temporizador</string>
 </resources>
