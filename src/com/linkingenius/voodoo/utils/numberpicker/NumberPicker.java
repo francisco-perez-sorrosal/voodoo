@@ -16,8 +16,6 @@
 
 package com.linkingenius.voodoo.utils.numberpicker;
 
-import com.linkingenius.voodoo.R;
-
 import android.content.Context;
 import android.os.Handler;
 import android.text.InputFilter;
@@ -25,15 +23,16 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.method.NumberKeyListener;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnLongClickListener;
-import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.linkingenius.voodoo.R;
 
 /**
  * This class has been pulled from the Android platform source code, its an internal widget that hasn't been

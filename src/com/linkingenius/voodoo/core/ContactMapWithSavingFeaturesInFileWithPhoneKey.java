@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import android.content.Context;
 import android.util.Log;
@@ -23,30 +20,25 @@ import com.linkingenius.voodoo.utils.Contact;
 
 /**
  * This is an instrumented class that extends the @ForwardingConcurrentMap, 
- * auto-saving the contents of the map onto a file on the Android file system.
+ * and allows to programatically save the contents of the map onto a file on the 
+ * Android file system.
  * 
  * @author Francisco PŽrez-Sorrosal (fperez)
  *
  */
-public class ContactMapAutosavedInFileWithPhoneKey extends ForwardingConcurrentMap<String, Contact> {
+public class ContactMapWithSavingFeaturesInFileWithPhoneKey extends ForwardingConcurrentMap<String, Contact> {
 	
-	private  final String TAG = "ContactMapAutosavedInFileWithPhoneKey";
+	private  final String TAG = "ContactMapWithSavingFeaturesInFileWithPhoneKey";
 	
-	private final long AUTOSAVING_PERIOD_IN_SECS = 60;
-	
-	private final ScheduledThreadPoolExecutor autosaveExecutor = new ScheduledThreadPoolExecutor(1);
-
 	private final Context context;
 	
 	private final String fileName;
-	
-	private ScheduledFuture futureTask;
-	
+		
 	// State. When true, the state of the map has been modified. This is used 
 	// in order to save the map in the specified file
 	private boolean modified;
 	
-	public ContactMapAutosavedInFileWithPhoneKey(Context context, ConcurrentMap<String, Contact> map, String fileName) {
+	public ContactMapWithSavingFeaturesInFileWithPhoneKey(Context context, ConcurrentMap<String, Contact> map, String fileName) {
 		super(map);
 		this.context = context;
 		this.fileName = fileName;
@@ -114,21 +106,6 @@ public class ContactMapAutosavedInFileWithPhoneKey extends ForwardingConcurrentM
 	}
 	
 	// ------------------------- Public Methods -----------------------------
-
-	public void autosaveContacts(boolean decision) {
-		if(decision) {
-			futureTask = autosaveExecutor.scheduleAtFixedRate(new Autosaver(), 
-					AUTOSAVING_PERIOD_IN_SECS, 
-					AUTOSAVING_PERIOD_IN_SECS, 
-					TimeUnit.SECONDS);
-			Log.d(TAG, "Autosaving enabled");
-		} else {
-			if(futureTask.cancel(false) && modified)
-				saveMapToFile();
-			autosaveExecutor.purge();
-			Log.d(TAG, "Autosaving disabled");
-		}
-	}
 	
 	public ArrayList<Contact> toArrayList() {
 		Set<Contact> duplicateContactFilter = new HashSet<Contact>(super.values());
@@ -176,7 +153,7 @@ public class ContactMapAutosavedInFileWithPhoneKey extends ForwardingConcurrentM
 		}
 	}
 	
-	private void saveMapToFile() {
+	public void saveMapToFile() {
 		if (modified) {
 			FileOutputStream fos = null;
 			ObjectOutputStream oos = null;
@@ -209,24 +186,6 @@ public class ContactMapAutosavedInFileWithPhoneKey extends ForwardingConcurrentM
 			}
 		} else {
 			Log.d(TAG, "The map of contacts doesn't need to be saved");
-		}
-	}
-	
-	// -------------------------- Private classes -----------------------------
-	
-	/**
-	 * Automatically saves contacts on file if any modification has been produced
-	 * 
-	 * Francisco PŽrez-Sorrosal (fperez)
-	 *
-	 */
-	private class Autosaver implements Runnable {
-
-		public void run() {
-			// Synchronize with the outer class
-			synchronized (ContactMapAutosavedInFileWithPhoneKey.this) {
-				saveMapToFile();
-			}
 		}
 	}
 	

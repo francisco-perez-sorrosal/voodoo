@@ -185,14 +185,13 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 	protected void onPause() {
 		super.onPause();
 		Log.d(TAG, "onPause");
-		BlackList.INSTANCE.stopAutosaving(getApplicationContext());
+		BlackList.INSTANCE.save(getApplicationContext());
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		Log.d(TAG, "onResume");
-		BlackList.INSTANCE.startAutosaving(getApplicationContext());
 	}
 
 	// ----------------------- END Lifecycle ------------------------

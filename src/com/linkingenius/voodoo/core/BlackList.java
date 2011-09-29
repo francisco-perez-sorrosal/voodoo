@@ -1,10 +1,7 @@
 package com.linkingenius.voodoo.core;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import android.content.Context;
 import android.util.Log;
@@ -26,7 +23,7 @@ public enum BlackList {
 	
 	private static final String FILE = "blacklist.txt";
 	
-	private ContactMapAutosavedInFileWithPhoneKey blackList = null;
+	private ContactMapWithSavingFeaturesInFileWithPhoneKey blackList = null;
 
 	public ArrayList<Contact> toArrayList(Context context) {
 		initialize(context);
@@ -75,21 +72,16 @@ public enum BlackList {
 		return blackList.get(contact);
 	}
 
-	public void startAutosaving(Context context) {
+	public void save(Context context) {
 		initialize(context);
-		blackList.autosaveContacts(true);
-	}
-
-	public void stopAutosaving(Context context) {
-		initialize(context);
-		blackList.autosaveContacts(false);
+		blackList.saveMapToFile();
 	}
 	
 	// ------------------------- Private Methods ----------------------------
 	
 	private synchronized void initialize(Context context){
 		if(blackList == null) {
-			blackList = new ContactMapAutosavedInFileWithPhoneKey(
+			blackList = new ContactMapWithSavingFeaturesInFileWithPhoneKey(
 					context,
 					new ConcurrentHashMap<String, Contact>(),
 					FILE);
