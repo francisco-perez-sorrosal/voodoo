@@ -128,7 +128,7 @@ public class MainActivity extends Activity implements OnClickListener, OnItemCli
 		
 		setContentView(R.layout.main);
 		
-		AdView adView = (AdView)this.findViewById(R.id.adView);
+		AdView adView = (AdView) this.findViewById(R.id.adView);
 	    AdRequest request = new AdRequest();
 	    request.addTestDevice(AdRequest.TEST_EMULATOR);
 	    request.addTestDevice("CF95DC53F383F9A836FD749F3EF439CD");
